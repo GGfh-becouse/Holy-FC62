@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ Admin Panel - Football PACK</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b1219;
+            color: #e0e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #f0f6ff;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #e0e8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .btn-primary {
+            background: #4a6cf7;
+            border-color: #4a6cf7;
+        }
+        .btn-primary:hover {
+            background: #5a7cf7;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .btn-danger:hover {
+            background: #f05a4a;
+        }
+        .btn-success {
+            background: #2ecc71;
+            border-color: #2ecc71;
+        }
+        .btn-success:hover {
+            background: #3ddc81;
+        }
+        
+        .table-container {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            overflow-x: auto;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th {
+            text-align: left;
+            padding: 12px 15px;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+        .rarity-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .rarity-common { background: rgba(200,200,200,0.2); color: #aaa; }
+        .rarity-rare { background: rgba(60,150,255,0.2); color: #6af; }
+        .rarity-super_rare { background: rgba(100,200,255,0.2); color: #6cf; }
+        .rarity-epic { background: rgba(180,80,255,0.2); color: #b6f; }
+        .rarity-legendary { background: rgba(255,180,0,0.2); color: #fd6; }
+        .rarity-special { background: rgba(255,50,100,0.2); color: #f6a; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #1a2733;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #e0e8f0;
+            font-size: 0.95rem;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.3);
+        }
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease;
+            z-index: 2000;
+        }
+        .toast.error {
+            background: #e74c3c;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: rgba(255,255,255,0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Game</a>
+        <h1>⚙️ Admin Panel</h1>
+        
+        <div class="stats" id="stats"></div>
+        
+        <div class="toolbar">
+            <button class="btn btn-primary" onclick="openAddModal()">➕ Add Card</button>
+            <button class="btn btn-success" onclick="exportCards()">📤 Export JSON</button>
+            <button class="btn" onclick="importCards()">📥 Import JSON</button>
+            <button class="btn btn-danger" onclick="clearAllCards()">🗑️ Clear All</button>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Rating</th>
+                        <th>Position</th>
+                        <th>Rarity</th>
+                        <th>Filename</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="cardsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="cardModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add Card</h2>
+            <form id="cardForm" onsubmit="saveCard(event)">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Player Name</label>
+                    <input type="text" id="playerName" required placeholder="e.g. Lionel Messi">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <input type="number" id="playerRating" required min="60" max="99" placeholder="85">
+                    </div>
+                    <div class="form-group">
+                        <label>Position</label>
+                        <select id="playerPosition">
+                            <option value="ST">ST</option>
+                            <option value="CAM">CAM</option>
+                            <option value="CM">CM</option>
+                            <option value="CDM">CDM</option>
+                            <option value="LW">LW</option>
+                            <option value="RW">RW</option>
+                            <option value="CB">CB</option>
+                            <option value="GK">GK</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Rarity</label>
+                    <select id="playerRarity">
+                        <option value="common">Common</option>
+                        <option value="rare">Rare</option>
+                        <option value="super_rare">Super Rare</option>
+                        <option value="epic">Epic</option>
+                        <option value="legendary">Legendary</option>
+                        <option value="special">Special</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="text" id="playerImage" required placeholder="https://.../player.png">
+                </div>
+                <div class="form-group">
+                    <label>Filename (for rarity detection)</label>
+                    <input type="text" id="playerFilename" placeholder="001, 01, or 1">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let cards = [];
+        let editingId = null;
+
+        // Load cards from localStorage
+        function loadCards() {
+            try {
+                const data = localStorage.getItem('admin_cards');
+                if (data) {
+                    cards = JSON.parse(data);
+                } else {
+                    // Generate default cards
+                    cards = generateDefaultCards();
+                    saveToLocalStorage();
+                }
+            } catch (e) {
+                cards = generateDefaultCards();
+                saveToLocalStorage();
+            }
+            renderTable();
+            updateStats();
+        }
+
+        function generateDefaultCards() {
+            const defaultCards = [];
+            const baseUrl = "https://raw.githubusercontent.com/ваш-username/ваш-репозиторий/main/images/";
+            
+            for (let i = 1; i <= 100; i++) {
+                const num = String(i).padStart(3, '0');
+                defaultCards.push({
+                    id: `player_${num}`,
+                    name: `Player ${num}`,
+                    rating: 70 + Math.floor(Math.random() * 15),
+                    position: ['ST', 'CAM', 'CM', 'CB', 'GK', 'LW', 'RW', 'CDM'][Math.floor(Math.random() * 8)],
+                    rarity: 'common',
+                    image: `${baseUrl}${num}.png`,
+                    filename: num
+                });
+            }
+            
+            for (let i = 1; i <= 20; i++) {
+                const num = String(i).padStart(2, '0');
+                const rarity = i <= 5 ? 'super_rare' : 'rare';
+                defaultCards.push({
+                    id: `player_${num}`,
+                    name: `Star ${num}`,
+                    rating: 82 + Math.floor(Math.random() * 10),
+                    position: ['ST', 'CAM', 'CM', 'LW', 'RW'][Math.floor(Math.random() * 5)],
+                    rarity: rarity,
+                    image: `${baseUrl}${num}.png`,
+                    filename: num
+                });
+            }
+            
+            for (let i = 1; i <= 10; i++) {
+                const rarity = i <= 2 ? 'special' : (i <= 5 ? 'legendary' : 'epic');
+                defaultCards.push({
+                    id: `player_${i}`,
+                    name: `Legend ${i}`,
+                    rating: 88 + Math.floor(Math.random() * 8),
+                    position: ['ST', 'CAM', 'LW', 'RW'][Math.floor(Math.random() * 4)],
+                    rarity: rarity,
+                    image: `${baseUrl}${i}.png`,
+                    filename: String(i)
+                });
+            }
+            
+            return defaultCards;
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('admin_cards', JSON.stringify(cards));
+            // Also save as cards.json for download
+            try {
+                const blob = new Blob([JSON.stringify(cards, null, 2)], { type: 'application/json' });
+                // We'll handle export separately
+            } catch (e) {}
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('cardsTableBody');
+            if (cards.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="icon">🃏</div>
+                                <p>No cards yet. Add your first card!</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = cards.map(card => `
+                <tr>
+                    <td><code style="font-size:0.8rem;color:rgba(255,255,255,0.4);">${card.id}</code></td>
+                    <td><strong>${card.name}</strong></td>
+                    <td>${card.rating}</td>
+                    <td>${card.position}</td>
+                    <td><span class="rarity-badge rarity-${card.rarity}">${card.rarity.replace('_', ' ')}</span></td>
+                    <td style="font-size:0.8rem;color:rgba(255,255,255,0.4);">${card.filename}</td>
+                    <td>
+                        <button class="btn" style="padding:4px 10px;font-size:0.8rem;" onclick="editCard('${card.id}')">✏️</button>
+                        <button class="btn btn-danger" style="padding:4px 10px;font-size:0.8rem;" onclick="deleteCard('${card.id}')">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            const rarities = {};
+            cards.forEach(c => {
+                rarities[c.rarity] = (rarities[c.rarity] || 0) + 1;
+            });
+            
+            stats.innerHTML = `
+                <div class="stat-card"><div class="label">Total Cards</div><div class="value">${cards.length}</div></div>
+                ${Object.entries(rarities).map(([rarity, count]) => `
+                    <div class="stat-card">
+                        <div class="label">${rarity.replace('_', ' ')}</div>
+                        <div class="value">${count}</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Card';
+            document.getElementById('cardForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('cardModal').classList.add('active');
+        }
+
+        function editCard(id) {
+            const card = cards.find(c => c.id === id);
+            if (!card) return;
+            
+            editingId = id;
+            document.getElementById('modalTitle').textContent = 'Edit Card';
+            document.getElementById('editId').value = id;
+            document.getElementById('playerName').value = card.name;
+            document.getElementById('playerRating').value = card.rating;
+            document.getElementById('playerPosition').value = card.position;
+            document.getElementById('playerRarity').value = card.rarity;
+            document.getElementById('playerImage').value = card.image;
+            document.getElementById('playerFilename').value = card.filename;
+            document.getElementById('cardModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('cardModal').classList.remove('active');
+        }
+
+        function saveCard(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('editId').value || `player_${Date.now()}`;
+            const name = document.getElementById('playerName').value.trim();
+            const rating = parseInt(document.getElementById('playerRating').value);
+            const position = document.getElementById('playerPosition').value;
+            const rarity = document.getElementById('playerRarity').value;
+            const image = document.getElementById('playerImage').value.trim();
+            const filename = document.getElementById('playerFilename').value.trim() || '001';
+            
+            if (!name || !image) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+            
+            const cardData = { id, name, rating, position, rarity, image, filename };
+            
+            if (editingId) {
+                const index = cards.findIndex(c => c.id === editingId);
+                if (index !== -1) {
+                    cards[index] = cardData;
+                }
+            } else {
+                cards.push(cardData);
+            }
+            
+            saveToLocalStorage();
+            renderTable();
+            updateStats();
+            closeModal();
+            showToast(`Card ${editingId ? 'updated' : 'added'} successfully!`);
+        }
+
+        function deleteCard(id) {
+            if (!confirm('Delete this card?')) return;
+            cards = cards.filter(c => c.id !== id);
+            saveToLocalStorage();
+            renderTable();
+            updateStats();
+            showToast('Card deleted');
+        }
+
+        function clearAllCards() {
+            if (!confirm('Delete ALL cards? This cannot be undone!')) return;
+            cards = [];
+            saveToLocalStorage();
+            renderTable();
+            updateStats();
+            showToast('All cards cleared');
+        }
+
+        function exportCards() {
+            const blob = new Blob([JSON.stringify(cards, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cards.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Cards exported!');
+        }
+
+        function importCards() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (!Array.isArray(data)) {
+                            throw new Error('Invalid format');
+                        }
+                        cards = data;
+                        saveToLocalStorage();
+                        renderTable();
+                        updateStats();
+                        showToast(`Imported ${cards.length} cards!`);
+                    } catch (err) {
+                        showToast('Invalid JSON file', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('cardModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Initialize
+        loadCards();
+    </script>
+</body>
+</html>
