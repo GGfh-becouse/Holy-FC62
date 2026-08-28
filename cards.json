@@ -1,0 +1,20 @@
+[
+  {
+    "id": "player_001",
+    "name": "Lionel Messi",
+    "rating": 95,
+    "position": "RW",
+    "rarity": "special",
+    "image": "https://raw.githubusercontent.com/ваш-username/ваш-репозиторий/main/images/1.png",
+    "filename": "1"
+  },
+  {
+    "id": "player_002",
+    "name": "Cristiano Ronaldo",
+    "rating": 94,
+    "position": "ST",
+    "rarity": "legendary",
+    "image": "https://raw.githubusercontent.com/ваш-username/ваш-репозиторий/main/images/2.png",
+    "filename": "2"
+  }
+]
