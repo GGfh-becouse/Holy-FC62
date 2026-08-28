@@ -1,565 +1,483 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⚽ PACK · открой картинку</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: radial-gradient(circle at 30% 10%, #1a2a3a, #0b1219);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            touch-action: manipulation;
-            padding: 12px;
-            overflow-x: hidden;
-        }
-        #app {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 24px;
-            position: relative;
-        }
-        
-        .lang-bar {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 4px 8px;
-            position: relative;
-            z-index: 10;
-        }
-        .lang-btn {
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.4);
-            font-weight: 500;
-            padding: 4px 8px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.85rem;
-            letter-spacing: 0.3px;
-        }
-        .lang-btn.active {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(2px);
-        }
-        .lang-btn:active { opacity: 0.6; }
-        
-        .pack-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 16px 0;
-        }
-        .pack {
-            width: 200px;
-            height: 240px;
-            background: linear-gradient(145deg, #2b3d4e, #16212b);
-            border-radius: 40px 16px 40px 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 3px rgba(255,255,255,0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1), box-shadow 0.3s;
-            cursor: pointer;
-            touch-action: manipulation;
-            user-select: none;
-            position: relative;
-        }
-        .pack:hover:not(.opening) {
-            transform: scale(1.04) rotate(1deg);
-            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.2);
-        }
-        .pack:active:not(.opening) { transform: scale(0.96); }
-        .pack .emoji-big {
-            font-size: 4.2rem;
-            line-height: 1;
-            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
-            margin-bottom: 8px;
-        }
-        .pack .pack-label {
-            font-weight: 700;
-            font-size: 1.6rem;
-            letter-spacing: 4px;
-            color: #f0f4fa;
-            text-shadow: 0 4px 8px rgba(0,0,0,0.6);
-            background: rgba(0,0,0,0.2);
-            padding: 4px 24px;
-            border-radius: 60px;
-            backdrop-filter: blur(2px);
-        }
-        .pack .pack-sub {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.25);
-            margin-top: 6px;
-            letter-spacing: 2px;
-        }
-        .pack.shake {
-            animation: shakePack 0.5s ease-in-out;
-        }
-        @keyframes shakePack {
-            0% { transform: rotate(0deg) scale(1); }
-            20% { transform: rotate(12deg) scale(1.02); }
-            40% { transform: rotate(-10deg) scale(0.98); }
-            60% { transform: rotate(6deg) scale(1.01); }
-            80% { transform: rotate(-4deg) scale(0.99); }
-            100% { transform: rotate(0deg) scale(1); }
-        }
-        .pack.flash {
-            animation: flashPack 0.5s ease-out;
-        }
-        @keyframes flashPack {
-            0% { box-shadow: 0 0 0 rgba(255,255,255,0); }
-            40% { box-shadow: 0 0 80px rgba(255, 215, 0, 0.8), 0 0 160px rgba(255, 200, 50, 0.5); }
-            100% { box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        }
-        .pack.opening { pointer-events: none; }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071321">
+  <title>FIFA 62 — Pack Opening</title>
+  <style>
+    :root {
+      --ink: #eaf6ff;
+      --muted: #91a7bb;
+      --blue: #19a7ff;
+      --cyan: #6deaff;
+      --gold: #ffc85a;
+      --navy: #06111e;
+      --panel: rgba(9, 30, 49, .72);
+    }
 
-        .image-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 8px 0;
-        }
-        .image-container img {
-            width: 100%;
-            max-width: 380px;
-            border-radius: 24px 8px 24px 8px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            animation: imageAppear 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1);
-            display: block;
-            background: #15222e;
-        }
-        @keyframes imageAppear {
-            0% { opacity: 0; transform: scale(0.8) translateY(30px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--navy); }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(31, 153, 255, .36), transparent 34rem),
+        radial-gradient(circle at 2% 96%, rgba(0, 218, 255, .13), transparent 32rem),
+        linear-gradient(145deg, #091d30 0%, #06111e 49%, #040a12 100%);
+    }
 
-        .screenshot-hint {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.15);
-            text-align: center;
-            letter-spacing: 0.8px;
-            padding: 8px 0 2px;
-            background: transparent;
-            border: none;
-            width: 100%;
-            cursor: default;
-            user-select: none;
-        }
+    body::before,
+    body::after {
+      position: fixed;
+      z-index: -1;
+      content: "";
+      pointer-events: none;
+    }
+    body::before {
+      inset: 0;
+      opacity: .15;
+      background-image: linear-gradient(rgba(132, 217, 255, .26) 1px, transparent 1px), linear-gradient(90deg, rgba(132, 217, 255, .26) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: radial-gradient(ellipse at center, black, transparent 76%);
+    }
+    body::after {
+      width: 82vmax;
+      height: 82vmax;
+      top: 38%;
+      left: 50%;
+      border: 1px solid rgba(115, 228, 255, .08);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 8vmax rgba(115, 228, 255, .025), 0 0 0 16vmax rgba(115, 228, 255, .018);
+    }
 
-        .open-again-btn {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 14px 28px;
-            border-radius: 60px;
-            color: #dce6f0;
-            font-weight: 600;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            backdrop-filter: blur(4px);
-            transition: all 0.2s;
-            cursor: pointer;
-            touch-action: manipulation;
-            width: fit-content;
-            margin: 8px auto 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        .open-again-btn:active { transform: scale(0.94); background: rgba(255,255,255,0.08); }
+    button { font: inherit; }
+    .app {
+      width: min(100%, 620px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 18px 18px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-        #fireworks-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 999;
-        }
-        
-        .hidden { display: none !important; }
-        .w-full { width: 100%; }
+    .topbar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; letter-spacing: -.04em; }
+    .brand-mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border: 1px solid rgba(131, 233, 255, .5);
+      border-radius: 10px 3px 10px 3px;
+      background: linear-gradient(135deg, rgba(37, 176, 255, .28), rgba(0, 66, 123, .5));
+      box-shadow: inset 0 0 15px rgba(108, 236, 255, .12), 0 0 22px rgba(34, 166, 255, .2);
+      color: var(--cyan);
+      font-size: 1.05rem;
+    }
+    .brand strong { display: block; font-size: 1.08rem; font-weight: 900; letter-spacing: .035em; }
+    .brand small { display: block; margin-top: 1px; color: var(--muted); font-size: .58rem; font-weight: 700; letter-spacing: .2em; }
+    .languages { display: flex; padding: 3px; border: 1px solid rgba(143, 204, 232, .12); border-radius: 10px; background: rgba(3, 13, 24, .45); }
+    .language {
+      padding: 5px 7px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #6f8aa1;
+      cursor: pointer;
+      font-size: .65rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      transition: .2s ease;
+    }
+    .language:hover { color: #dff8ff; }
+    .language.active { background: rgba(101, 221, 255, .15); color: #dffaff; }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .pack-loading-text {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+    .opening-stage {
+      width: 100%;
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 30px 0 20px;
+    }
+    .pack-screen, .card-screen { width: 100%; display: grid; place-items: center; }
+    .card-screen[hidden], .pack-screen[hidden] { display: none; }
 
-        @media (max-width: 480px) {
-            .pack { width: 170px; height: 210px; }
-            .pack .emoji-big { font-size: 3.6rem; }
-            .lang-bar { font-size: 0.8rem; }
-        }
-        @media (min-width: 800px) {
-            body { padding: 40px; }
-        }
+    .pack-copy { text-align: center; }
+    .eyebrow {
+      margin: 0 0 9px;
+      color: var(--cyan);
+      font-size: .66rem;
+      font-weight: 800;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+    }
+    h1 { margin: 0; font-size: clamp(2.25rem, 10vw, 3.75rem); font-weight: 950; letter-spacing: -.07em; line-height: .9; }
+    h1 span { color: var(--gold); text-shadow: 0 0 30px rgba(255, 194, 77, .35); }
+    .subtitle { margin: 13px 0 0; color: var(--muted); font-size: .83rem; line-height: 1.45; }
 
-        .error-placeholder {
-            width: 100%;
-            max-width: 380px;
-            aspect-ratio: 1/0.9;
-            background: #1a2733;
-            border-radius: 24px 8px 24px 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255,255,255,0.2);
-            font-size: 1rem;
-            letter-spacing: 1px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-    </style>
+    .pack-area { position: relative; width: min(82vw, 320px); aspect-ratio: .72; margin: 27px auto 24px; }
+    .aura { position: absolute; inset: 11% -22%; border-radius: 50%; background: radial-gradient(ellipse, rgba(43, 176, 255, .4), rgba(18, 146, 255, .1) 43%, transparent 71%); filter: blur(9px); animation: pulse 2.8s ease-in-out infinite; }
+    .pack {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      border: 0;
+      border-radius: 18px 4px 20px 5px;
+      overflow: hidden;
+      cursor: pointer;
+      color: white;
+      transform: perspective(900px) rotateY(-7deg) rotateZ(2deg);
+      transition: transform .28s cubic-bezier(.2,.9,.2,1), filter .28s;
+      background:
+        linear-gradient(118deg, transparent 0 37%, rgba(255,255,255,.16) 38% 40%, transparent 41% 100%),
+        radial-gradient(circle at 79% 16%, #65e5ff 0 2%, transparent 2.4%),
+        radial-gradient(circle at 70% 28%, #65e5ff 0 1.2%, transparent 1.7%),
+        linear-gradient(140deg, #004b83 0%, #082a53 35%, #071a35 65%, #031327 100%);
+      box-shadow: 15px 25px 38px rgba(0, 0, 0, .55), inset 0 0 0 2px rgba(157, 235, 255, .35), inset 0 0 36px rgba(16, 129, 232, .55), 0 0 32px rgba(30, 173, 255, .25);
+    }
+    .pack::before, .pack::after { position: absolute; content: ""; pointer-events: none; }
+    .pack::before { inset: 7px; border: 1px solid rgba(177, 240, 255, .46); border-radius: 13px 2px 15px 3px; }
+    .pack::after { width: 140%; height: 30%; top: 40%; left: -22%; opacity: .33; background: linear-gradient(90deg, transparent, #9cf2ff, transparent); transform: rotate(-34deg); filter: blur(8px); }
+    .pack:hover:not(:disabled) { transform: perspective(900px) rotateY(-1deg) rotateZ(0) translateY(-8px) scale(1.025); filter: brightness(1.13); }
+    .pack:active:not(:disabled) { transform: perspective(900px) rotateY(-2deg) rotateZ(0) translateY(-2px) scale(.985); }
+    .pack:focus-visible, .primary:focus-visible, .language:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+    .pack:disabled { cursor: wait; }
+    .pack-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; isolation: isolate; }
+    .pack-rarity { position: absolute; top: 18px; left: 0; right: 0; color: rgba(203, 249, 255, .75); font-size: .58rem; font-weight: 800; letter-spacing: .32em; }
+    .pack-rating { color: #fff9d7; font-size: clamp(4.2rem, 20vw, 6.2rem); font-weight: 950; font-style: italic; letter-spacing: -.13em; line-height: .8; text-shadow: 0 3px 0 #b77d1c, 0 8px 22px #002647; }
+    .pack-title { margin-top: 17px; color: #fff; font-size: 1.65rem; font-weight: 950; font-style: italic; letter-spacing: -.09em; line-height: .85; text-shadow: 0 3px 14px #00162d; }
+    .pack-title em { color: #74eeff; font-style: normal; }
+    .pack-lines { position: absolute; bottom: 34px; display: flex; gap: 5px; }
+    .pack-lines i { display: block; width: 23px; height: 2px; background: #78edff; box-shadow: 0 0 8px #78edff; transform: skewX(-29deg); }
+    .pack-lines i:nth-child(2) { width: 34px; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+    .pack-foot { position: absolute; bottom: 15px; color: rgba(214, 246, 255, .5); font-size: .48rem; font-weight: 800; letter-spacing: .24em; }
+    .pack.opening { animation: packOpen .98s ease-in-out forwards; }
+    .pack.opening::after { animation: sheen .75s ease-in .12s forwards; }
+
+    .primary {
+      min-width: 225px;
+      padding: 15px 23px;
+      border: 1px solid rgba(151, 235, 255, .5);
+      border-radius: 8px 3px 8px 3px;
+      color: #001521;
+      cursor: pointer;
+      background: linear-gradient(115deg, #cefbff, #47d9ff 56%, #1da4e9);
+      box-shadow: 0 9px 28px rgba(24, 179, 255, .25), inset 0 1px rgba(255,255,255,.8);
+      font-size: .78rem;
+      font-weight: 950;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      transition: transform .18s, filter .18s;
+    }
+    .primary:hover { filter: brightness(1.12); transform: translateY(-2px); }
+    .primary:active { transform: translateY(1px) scale(.98); }
+    .primary[disabled] { cursor: wait; opacity: .7; }
+    .tip { margin: 13px 0 0; color: #627f94; font-size: .67rem; }
+    .tip kbd { padding: 2px 5px; border: 1px solid rgba(134,203,234,.25); border-radius: 4px; color: #a7c5d5; font-family: inherit; }
+
+    .card-screen { text-align: center; }
+    .result-header { margin-bottom: 16px; }
+    .result-header .eyebrow { margin-bottom: 6px; }
+    .result-title { margin: 0; font-size: 1.55rem; font-weight: 900; letter-spacing: -.045em; }
+    .result-title strong { color: var(--gold); }
+    .card-frame {
+      position: relative;
+      width: min(90vw, 390px);
+      min-height: 280px;
+      padding: 5px;
+      border: 1px solid rgba(126, 229, 255, .45);
+      border-radius: 17px 4px 17px 4px;
+      background: linear-gradient(140deg, rgba(133, 241, 255, .7), rgba(20, 145, 242, .28) 38%, rgba(255, 199, 82, .58) 100%);
+      box-shadow: 0 20px 46px rgba(0, 0, 0, .5), 0 0 46px rgba(28, 176, 255, .2);
+      animation: reveal .55s cubic-bezier(.14,.9,.24,1.2) both;
+    }
+    .card-frame::before { position: absolute; inset: -2px; z-index: -1; border-radius: inherit; content: ""; background: linear-gradient(110deg, transparent 20%, rgba(218,252,255,.72), transparent 49%); filter: blur(10px); }
+    .card-image {
+      display: block;
+      width: 100%;
+      max-height: min(62vh, 560px);
+      min-height: 270px;
+      border-radius: 12px 2px 12px 2px;
+      object-fit: contain;
+      background: #071522;
+    }
+    .card-error {
+      display: grid;
+      width: 100%;
+      min-height: 270px;
+      padding: 25px;
+      place-items: center;
+      border-radius: 12px 2px 12px 2px;
+      background: linear-gradient(135deg, #102a40, #071522);
+      color: #c3dfed;
+      font-size: .9rem;
+      line-height: 1.5;
+    }
+    .card-error span { color: #7698ad; font-size: .72rem; }
+    .result-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 21px; }
+    .secondary { border: 0; padding: 6px 10px; background: transparent; color: #8daabc; cursor: pointer; font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-decoration: underline; text-underline-offset: 4px; }
+    .secondary:hover { color: white; }
+
+    .footer { width: 100%; margin-top: auto; padding-top: 10px; color: #547287; font-size: .59rem; font-weight: 650; letter-spacing: .1em; text-align: center; text-transform: uppercase; }
+    #fx { position: fixed; inset: 0; z-index: 10; width: 100%; height: 100%; pointer-events: none; }
+
+    @keyframes pulse { 50% { opacity: .58; transform: scale(1.08); } }
+    @keyframes packOpen {
+      0% { transform: perspective(900px) rotateY(-7deg) rotateZ(2deg) scale(1); }
+      17% { transform: perspective(900px) rotateY(9deg) rotateZ(-4deg) scale(.97); }
+      38% { transform: perspective(900px) rotateY(-14deg) rotateZ(5deg) scale(1.03); filter: brightness(1.5); }
+      61% { transform: perspective(900px) rotateY(6deg) rotateZ(-2deg) scale(1.02); filter: brightness(2); }
+      100% { transform: perspective(900px) rotateY(0) rotateZ(0) scale(1.13); filter: brightness(2.8); opacity: .08; }
+    }
+    @keyframes sheen { to { transform: translate(80%, -100%) rotate(-34deg); opacity: .9; } }
+    @keyframes reveal { from { opacity: 0; transform: translateY(28px) scale(.82); filter: brightness(2.3); } to { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); } }
+    @media (max-height: 720px) { .opening-stage { padding-top: 15px; } .pack-area { width: min(63vw, 235px); margin: 18px auto; } .subtitle { margin-top: 9px; } }
+    @media (max-width: 380px) { .app { padding-inline: 13px; } .pack-area { width: min(78vw, 270px); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+  </style>
 </head>
 <body>
-    <div id="app">
-        <div class="lang-bar">
-            <button class="lang-btn active" data-lang="ru">RU</button>
-            <button class="lang-btn" data-lang="en">EN</button>
-            <button class="lang-btn" data-lang="kz">KZ</button>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand" aria-label="FIFA 62">
+        <div class="brand-mark">⚽</div>
+        <div><strong>FIFA 62</strong><small>Ultimate Pack</small></div>
+      </div>
+      <nav class="languages" aria-label="Язык">
+        <button class="language active" type="button" data-lang="ru">RU</button>
+        <button class="language" type="button" data-lang="en">EN</button>
+        <button class="language" type="button" data-lang="kz">KZ</button>
+      </nav>
+    </header>
+
+    <section class="opening-stage" aria-live="polite">
+      <div id="packScreen" class="pack-screen">
+        <div class="pack-copy">
+          <p class="eyebrow" id="eyebrow">ЛЕГЕНДАРНЫЙ НАБОР</p>
+          <h1 id="heading">ОТКРОЙ <span>ПАК</span></h1>
+          <p class="subtitle" id="subtitle">Каждое открытие — новая футбольная карта.</p>
         </div>
 
-        <div id="packView" class="pack-wrapper">
-            <div id="packElement" class="pack">
-                <div class="emoji-big">⚽</div>
-                <div class="pack-label" id="packLabel">PACK</div>
-                <div class="pack-sub" id="packSub">OPEN</div>
-            </div>
-            <div style="height:12px;"></div>
-            <div id="openPackBtn" class="open-again-btn" style="margin-top:0;">OPEN PACK</div>
+        <div class="pack-area">
+          <div class="aura"></div>
+          <button id="pack" class="pack" type="button" aria-label="Открыть пак">
+            <span class="pack-inner">
+              <span class="pack-rarity">LEGENDARY</span>
+              <span class="pack-rating">62</span>
+              <span class="pack-title">FIFA <em>62</em></span>
+              <span class="pack-lines"><i></i><i></i><i></i></span>
+              <span class="pack-foot">ULTIMATE PACK</span>
+            </span>
+          </button>
         </div>
 
-        <div id="imageView" class="hidden w-full" style="display: none; flex-direction: column; align-items: center;">
-            <div id="imageContainer" class="image-container w-full"></div>
-            <div id="screenshotHint" class="screenshot-hint">📸 take a screenshot</div>
-            <div id="openAgainBtn" class="open-again-btn">OPEN AGAIN</div>
+        <button id="openButton" class="primary" type="button">ОТКРЫТЬ ПАК</button>
+        <p class="tip" id="tip">Нажми на пак или кнопку</p>
+      </div>
+
+      <div id="cardScreen" class="card-screen" hidden>
+        <div class="result-header">
+          <p class="eyebrow" id="resultEyebrow">ТВОЙ НОВЫЙ ИГРОК</p>
+          <p class="result-title" id="resultTitle">КАРТА <strong>ВЫПАЛА!</strong></p>
         </div>
-    </div>
-    <canvas id="fireworks-canvas"></canvas>
+        <div class="card-frame" id="cardFrame"></div>
+        <div class="result-actions">
+          <button id="againButton" class="primary" type="button">ОТКРЫТЬ ЕЩЁ</button>
+          <button id="backButton" class="secondary" type="button">Вернуться к набору</button>
+        </div>
+      </div>
+    </section>
 
-    <script>
-        // ================= TRANSLATIONS =================
-        const translations = {
-            ru: {
-                openPack: "Открыть пак",
-                openAgain: "Открыть снова",
-                screenshot: "Сделай скриншот",
-                loading: "Открытие...",
-                packLabel: "PACK"
-            },
-            en: {
-                openPack: "Open Pack",
-                openAgain: "Open Again",
-                screenshot: "Take a screenshot",
-                loading: "Opening...",
-                packLabel: "PACK"
-            },
-            kz: {
-                openPack: "Пакетті ашу",
-                openAgain: "Қайта ашу",
-                screenshot: "Скриншот жаса",
-                loading: "Ашылуда...",
-                packLabel: "PACK"
-            }
-        };
+    <footer class="footer" id="footer">FIFA 62 · Pack opening experience</footer>
+  </main>
+  <canvas id="fx" aria-hidden="true"></canvas>
 
-        // ================= IMAGE LIST =================
-        // Укажи здесь ВСЕ файлы из папки images с их расширениями
-        const images = [
-            "1.jpeg",
-            "2.jpeg",
-            "3.jpeg",
-            "4.jpeg",
-            "5.jpeg",
-            "6.jpg",
-        ];
+  <script>
+    // Добавляй сюда точные имена файлов из папки images.
+    // Структура: index.html и папка images должны находиться рядом.
+    const cards = ["1.jpeg", "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg", "6.jpg"];
+    const cardDirectory = "images";
 
-        // ================= STATE =================
-        let isOpening = false;
-        let currentImage = null;
-        let currentLang = 'ru';
-        let fireworkParticles = [];
-        let animationFrame = null;
+    const text = {
+      ru: {
+        eyebrow: "ЛЕГЕНДАРНЫЙ НАБОР", heading: "ОТКРОЙ <span>ПАК</span>", subtitle: "Каждое открытие — новая футбольная карта.",
+        open: "ОТКРЫТЬ ПАК", opening: "ОТКРЫВАЕМ…", tip: "Нажми на пак или кнопку", resultEyebrow: "ТВОЙ НОВЫЙ ИГРОК",
+        result: "КАРТА <strong>ВЫПАЛА!</strong>", again: "ОТКРЫТЬ ЕЩЁ", back: "Вернуться к набору", footer: "FIFA 62 · Открытие наборов",
+        missing: "Карта не найдена", check: "Проверь путь:"
+      },
+      en: {
+        eyebrow: "LEGENDARY PACK", heading: "OPEN THE <span>PACK</span>", subtitle: "Every opening reveals a new football card.",
+        open: "OPEN PACK", opening: "OPENING…", tip: "Tap the pack or the button", resultEyebrow: "YOUR NEW PLAYER",
+        result: "CARD <strong>REVEALED!</strong>", again: "OPEN ANOTHER", back: "Back to the pack", footer: "FIFA 62 · Pack opening experience",
+        missing: "Card not found", check: "Check the path:"
+      },
+      kz: {
+        eyebrow: "АҢЫЗДЫҚ ЖИНАҚ", heading: "ПАКЕТТІ <span>АШ</span>", subtitle: "Әр ашылым — жаңа футбол картасы.",
+        open: "ПАКЕТТІ АШУ", opening: "АШЫЛУДА…", tip: "Пакетке не батырмаға бас", resultEyebrow: "СЕНІҢ ЖАҢА ОЙЫНШЫҢ",
+        result: "КАРТА <strong>ТҮСТІ!</strong>", again: "ҚАЙТА АШУ", back: "Пакетке оралу", footer: "FIFA 62 · Пакеттерді ашу",
+        missing: "Карта табылмады", check: "Жолды тексер:"
+      }
+    };
 
-        // ================= DOM REFS =================
-        const packView = document.getElementById('packView');
-        const imageView = document.getElementById('imageView');
-        const packElement = document.getElementById('packElement');
-        const packLabel = document.getElementById('packLabel');
-        const packSub = document.getElementById('packSub');
-        const openPackBtn = document.getElementById('openPackBtn');
-        const imageContainer = document.getElementById('imageContainer');
-        const screenshotHint = document.getElementById('screenshotHint');
-        const openAgainBtn = document.getElementById('openAgainBtn');
-        const langBtns = document.querySelectorAll('.lang-btn');
-        const canvas = document.getElementById('fireworks-canvas');
-        const ctx = canvas.getContext('2d');
+    const packScreen = document.getElementById("packScreen");
+    const cardScreen = document.getElementById("cardScreen");
+    const pack = document.getElementById("pack");
+    const openButton = document.getElementById("openButton");
+    const againButton = document.getElementById("againButton");
+    const backButton = document.getElementById("backButton");
+    const cardFrame = document.getElementById("cardFrame");
+    const fx = document.getElementById("fx");
+    const context = fx.getContext("2d");
+    let language = "ru";
+    let opening = false;
+    let lastCard = null;
+    let particles = [];
+    let animationId = 0;
 
-        // ================= FUNCTIONS =================
-        function getRandomImage() {
-            if (images.length === 0) return null;
-            const randomIndex = Math.floor(Math.random() * images.length);
-            return images[randomIndex];
-        }
+    function currentText() { return text[language]; }
+    function cardPath(fileName) { return `${cardDirectory}/${encodeURIComponent(fileName)}`; }
+    function pickCard() {
+      if (!cards.length) return null;
+      if (cards.length === 1) return cards[0];
+      const options = cards.filter(card => card !== lastCard);
+      return options[Math.floor(Math.random() * options.length)];
+    }
 
-        function getImagePath(filename) {
-            return `images/${filename}`;
-        }
+    function setLanguage(nextLanguage) {
+      language = nextLanguage;
+      const copy = currentText();
+      document.querySelectorAll(".language").forEach(button => button.classList.toggle("active", button.dataset.lang === language));
+      document.getElementById("eyebrow").textContent = copy.eyebrow;
+      document.getElementById("heading").innerHTML = copy.heading;
+      document.getElementById("subtitle").textContent = copy.subtitle;
+      document.getElementById("tip").textContent = copy.tip;
+      document.getElementById("resultEyebrow").textContent = copy.resultEyebrow;
+      document.getElementById("resultTitle").innerHTML = copy.result;
+      document.getElementById("againButton").textContent = copy.again;
+      document.getElementById("backButton").textContent = copy.back;
+      document.getElementById("footer").textContent = copy.footer;
+      if (!opening) openButton.textContent = copy.open;
+      try { localStorage.setItem("fifa62-language", language); } catch (_) {}
+    }
 
-        // ================= PACK OPENING =================
-        function openPack() {
-            if (isOpening) return;
-            if (images.length === 0) {
-                alert('No images in the folder! Add images to the "images" folder and update the list.');
-                return;
-            }
-            
-            isOpening = true;
-            currentImage = null;
-            packElement.classList.add('opening');
-            openPackBtn.style.pointerEvents = 'none';
-            
-            // Скрываем картинку, показываем пак
-            imageView.style.display = 'none';
-            packView.style.display = 'flex';
+    function resizeCanvas() {
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      fx.width = Math.floor(window.innerWidth * pixelRatio);
+      fx.height = Math.floor(window.innerHeight * pixelRatio);
+      fx.style.width = `${window.innerWidth}px`;
+      fx.style.height = `${window.innerHeight}px`;
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    }
 
-            packLabel.innerHTML = `<div class="pack-loading-text"><span class="loading-spinner"></span> ${translations[currentLang].loading}</div>`;
-            packSub.textContent = '';
+    function launchParticles() {
+      const colors = ["#78efff", "#ffffff", "#ffc85a", "#2c9dff", "#a8f4ff"];
+      const centerX = window.innerWidth / 2;
+      const centerY = Math.min(window.innerHeight * .47, 370);
+      particles = Array.from({ length: 72 }, () => {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 6;
+        return { x: centerX, y: centerY, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 2, life: 1, decay: .012 + Math.random() * .017, size: 1 + Math.random() * 3.5, color: colors[Math.floor(Math.random() * colors.length)] };
+      });
+      cancelAnimationFrame(animationId);
+      drawParticles();
+    }
 
-            packElement.classList.remove('shake', 'flash');
-            void packElement.offsetWidth;
-            packElement.classList.add('shake');
-            
-            const imageName = getRandomImage();
-            currentImage = imageName;
-            
-            setTimeout(() => {
-                packElement.classList.remove('shake');
-                packElement.classList.add('flash');
-            }, 500);
-            
-            setTimeout(() => {
-                packElement.classList.remove('flash');
-                showImage(imageName);
-                
-                packLabel.textContent = translations[currentLang].packLabel || 'PACK';
-                packSub.textContent = '';
-                packElement.classList.remove('opening');
-                openPackBtn.style.pointerEvents = 'auto';
-                isOpening = false;
-            }, 1000);
-        }
+    function drawParticles() {
+      context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      let alive = false;
+      for (const particle of particles) {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.vy += .06;
+        particle.vx *= .985;
+        particle.life -= particle.decay;
+        if (particle.life <= 0) continue;
+        alive = true;
+        context.globalAlpha = particle.life;
+        context.fillStyle = particle.color;
+        context.shadowColor = particle.color;
+        context.shadowBlur = 12;
+        context.beginPath();
+        context.arc(particle.x, particle.y, particle.size * particle.life, 0, Math.PI * 2);
+        context.fill();
+      }
+      context.globalAlpha = 1;
+      context.shadowBlur = 0;
+      if (alive) animationId = requestAnimationFrame(drawParticles);
+      else context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
 
-        // ================= SHOW IMAGE =================
-        function showImage(filename) {
-            if (!filename) {
-                imageContainer.innerHTML = `<div class="error-placeholder">⚠️ No image available</div>`;
-                return;
-            }
-            
-            const imagePath = getImagePath(filename);
-            
-            imageContainer.innerHTML = `
-                <img src="${imagePath}" 
-                     alt="Card" 
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="error-placeholder" style="display:none;">
-                    ⚠️ Image not found<br>
-                    <span style="font-size:0.7rem;opacity:0.5;">${filename}</span>
-                </div>
-            `;
+    function showCard(fileName) {
+      const copy = currentText();
+      packScreen.hidden = true;
+      cardScreen.hidden = false;
+      cardFrame.innerHTML = "";
+      const image = new Image();
+      image.className = "card-image";
+      image.alt = "FIFA 62 card";
+      image.src = cardPath(fileName);
+      image.addEventListener("load", launchParticles, { once: true });
+      image.addEventListener("error", () => {
+        cardFrame.innerHTML = `<div class="card-error"><div>${copy.missing}<br><span>${copy.check} ${cardPath(fileName)}</span></div></div>`;
+        launchParticles();
+      }, { once: true });
+      cardFrame.append(image);
+      lastCard = fileName;
+    }
 
-            const img = imageContainer.querySelector('img');
-            if (img) {
-                img.onload = function() {
-                    // Картинка загрузилась - запускаем фейерверки
-                    launchFireworks();
-                };
-                img.onerror = function() {
-                    this.style.display = 'none';
-                    const placeholder = this.nextElementSibling;
-                    if (placeholder) placeholder.style.display = 'flex';
-                    // Все равно запускаем фейерверки, но с задержкой
-                    setTimeout(launchFireworks, 300);
-                };
-            }
+    function openPack() {
+      if (opening) return;
+      const selectedCard = pickCard();
+      if (!selectedCard) return;
+      opening = true;
+      pack.disabled = true;
+      openButton.disabled = true;
+      openButton.textContent = currentText().opening;
+      pack.classList.remove("opening");
+      void pack.offsetWidth;
+      pack.classList.add("opening");
+      window.setTimeout(() => {
+        pack.classList.remove("opening");
+        pack.disabled = false;
+        openButton.disabled = false;
+        opening = false;
+        openButton.textContent = currentText().open;
+        showCard(selectedCard);
+      }, 980);
+    }
 
-            screenshotHint.textContent = '📸 ' + translations[currentLang].screenshot;
-            packView.style.display = 'none';
-            imageView.style.display = 'flex';
-            openAgainBtn.textContent = translations[currentLang].openAgain;
-        }
+    function returnToPack() {
+      cardScreen.hidden = true;
+      packScreen.hidden = false;
+      particles = [];
+      cancelAnimationFrame(animationId);
+      context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      pack.focus();
+    }
 
-        // ================= FIREWORKS =================
-        function launchFireworks() {
-            const count = 40;
-            const particles = [];
-            const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a29bfe', '#fd79a8', '#fdcb6e', '#ff9ff3', '#48dbfb'];
-            const cx = window.innerWidth / 2;
-            const cy = window.innerHeight / 2;
+    document.querySelectorAll(".language").forEach(button => button.addEventListener("click", () => setLanguage(button.dataset.lang)));
+    pack.addEventListener("click", openPack);
+    openButton.addEventListener("click", openPack);
+    againButton.addEventListener("click", () => { returnToPack(); window.setTimeout(openPack, 100); });
+    backButton.addEventListener("click", returnToPack);
+    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("keydown", event => { if ((event.key === "Enter" || event.key === " ") && !opening && !cardScreen.hidden) { event.preventDefault(); returnToPack(); } });
 
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * 2 * Math.PI;
-                const speed = 1.5 + Math.random() * 5;
-                const size = 2 + Math.random() * 7;
-                particles.push({
-                    x: cx + (Math.random() - 0.5) * 60,
-                    y: cy + (Math.random() - 0.5) * 40,
-                    vx: Math.cos(angle) * speed * (0.6 + Math.random() * 0.8),
-                    vy: Math.sin(angle) * speed * (0.6 + Math.random() * 0.8) - 1.5,
-                    life: 1,
-                    decay: 0.008 + Math.random() * 0.015,
-                    size: size,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    gravity: 0.03 + Math.random() * 0.05,
-                });
-            }
-            
-            fireworkParticles = particles;
-            if (animationFrame) {
-                cancelAnimationFrame(animationFrame);
-                animationFrame = null;
-            }
-            drawFireworks();
-        }
-
-        function drawFireworks() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let alive = false;
-            for (const p of fireworkParticles) {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += p.gravity;
-                p.vx *= 0.99;
-                p.life -= p.decay;
-                if (p.life <= 0) continue;
-                alive = true;
-                ctx.globalAlpha = p.life * 0.9;
-                ctx.fillStyle = p.color;
-                ctx.shadowColor = p.color;
-                ctx.shadowBlur = 15;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, Math.max(0.5, p.size * p.life * 0.8), 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.shadowBlur = 0;
-            ctx.globalAlpha = 1;
-            if (alive) {
-                animationFrame = requestAnimationFrame(drawFireworks);
-            } else {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                animationFrame = null;
-                fireworkParticles = [];
-            }
-        }
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // ================= LANGUAGE =================
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.lang === lang);
-            });
-            openPackBtn.textContent = translations[lang].openPack;
-            openAgainBtn.textContent = translations[lang].openAgain;
-            screenshotHint.textContent = '📸 ' + translations[lang].screenshot;
-            packLabel.textContent = translations[lang].packLabel || 'PACK';
-            if (!imageView.style.display || imageView.style.display === 'none') {
-                packSub.textContent = '';
-            }
-            try { localStorage.setItem('pack_lang', lang); } catch(e){}
-        }
-
-        // ================= UI EVENTS =================
-        openPackBtn.addEventListener('click', openPack);
-        packElement.addEventListener('click', openPack);
-        openAgainBtn.addEventListener('click', () => {
-            imageView.style.display = 'none';
-            packView.style.display = 'flex';
-            packElement.classList.remove('opening');
-            openPackBtn.style.pointerEvents = 'auto';
-            currentImage = null;
-            packLabel.textContent = translations[currentLang].packLabel || 'PACK';
-            packSub.textContent = '';
-            
-            fireworkParticles = [];
-            if (animationFrame) {
-                cancelAnimationFrame(animationFrame);
-                animationFrame = null;
-            }
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            isOpening = false;
-        });
-
-        langBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const lang = btn.dataset.lang;
-                if (lang !== currentLang) setLanguage(lang);
-            });
-        });
-
-        // ================= INIT =================
-        function init() {
-            try {
-                const saved = localStorage.getItem('pack_lang');
-                if (saved && translations[saved]) {
-                    setLanguage(saved);
-                } else {
-                    setLanguage('ru');
-                }
-            } catch(e){ setLanguage('ru'); }
-            
-            isOpening = false;
-            packElement.classList.remove('opening');
-            console.log('⚽ PACK ready!');
-            console.log('📁 Images found:', images.length);
-            console.log('📁 Images list:', images);
-        }
-
-        init();
-    </script>
+    resizeCanvas();
+    try { setLanguage(localStorage.getItem("fifa62-language") || "ru"); } catch (_) { setLanguage("ru"); }
+  </script>
 </body>
 </html>
