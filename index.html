@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⚽ PACK · футбольная карточка</title>
     <style>
-        /* RESET */
         * {
             margin: 0;
             padding: 0;
@@ -22,7 +21,6 @@
             padding: 12px;
             overflow-x: hidden;
         }
-        /* MAIN UI */
         #app {
             width: 100%;
             max-width: 480px;
@@ -34,7 +32,6 @@
             gap: 24px;
             position: relative;
         }
-        /* LANGUAGE */
         .lang-bar {
             width: 100%;
             display: flex;
@@ -65,7 +62,6 @@
         }
         .lang-btn:active { opacity: 0.6; }
         
-        /* PACK */
         .pack-wrapper {
             display: flex;
             flex-direction: column;
@@ -138,8 +134,14 @@
             100% { box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         }
         .pack.opening { pointer-events: none; }
+        .pack.dramatic-loading {
+            animation: dramaticPulse 2s ease-in-out infinite;
+        }
+        @keyframes dramaticPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255,215,0,0.1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(255,215,0,0.4), 0 0 120px rgba(255,200,50,0.2); }
+        }
 
-        /* CARD */
         .card-container {
             width: 100%;
             display: flex;
@@ -244,7 +246,6 @@
             text-transform: uppercase;
         }
 
-        /* RARITY STYLES (overlay glow) - dynamic */
         .player-card.common { border-color: rgba(200,200,200,0.1); }
         .player-card.rare { box-shadow: 0 0 20px rgba(60, 150, 255, 0.2), 0 20px 40px rgba(0,0,0,0.6); }
         .player-card.super-rare { box-shadow: 0 0 30px rgba(100, 200, 255, 0.4), 0 20px 40px rgba(0,0,0,0.6); }
@@ -252,16 +253,6 @@
         .player-card.legendary { box-shadow: 0 0 70px rgba(255, 180, 0, 0.7), 0 20px 40px rgba(0,0,0,0.6); }
         .player-card.special { box-shadow: 0 0 90px rgba(255, 50, 100, 0.8), 0 20px 40px rgba(0,0,0,0.6); }
 
-        /* SPECIAL DRAMATIC LOADING */
-        .pack.dramatic-loading {
-            animation: dramaticPulse 2s ease-in-out infinite;
-        }
-        @keyframes dramaticPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255,215,0,0.1); }
-            50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(255,215,0,0.4), 0 0 120px rgba(255,200,50,0.2); }
-        }
-
-        /* SCREENSHOT TEXT */
         .screenshot-hint {
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.2);
@@ -276,7 +267,6 @@
         }
         .screenshot-hint:active { opacity: 0.5; }
 
-        /* OPEN AGAIN */
         .open-again-btn {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -296,7 +286,6 @@
         }
         .open-again-btn:active { transform: scale(0.94); background: rgba(255,255,255,0.08); }
 
-        /* FIREWORKS canvas */
         #fireworks-canvas {
             position: fixed;
             top: 0;
@@ -306,12 +295,24 @@
             pointer-events: none;
             z-index: 999;
         }
-        /* utils */
         .hidden { display: none !important; }
         .mt-8 { margin-top: 8px; }
         .w-full { width: 100%; }
 
-        /* responsive */
+        .admin-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255,255,255,0.1);
+            font-size: 0.7rem;
+            text-decoration: none;
+            transition: color 0.3s;
+            z-index: 100;
+        }
+        .admin-link:hover {
+            color: rgba(255,255,255,0.3);
+        }
+
         @media (max-width: 480px) {
             .pack { width: 170px; height: 210px; }
             .pack .emoji-big { font-size: 3.6rem; }
@@ -323,18 +324,42 @@
             body { padding: 40px; }
             .player-card { max-width: 420px; }
         }
+
+        @keyframes cardDramaticAppear {
+            0% { opacity: 0; transform: scale(0.5) rotate(-5deg); filter: blur(10px); }
+            50% { opacity: 0.5; transform: scale(1.1) rotate(2deg); filter: blur(2px); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .pack-loading-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
     <div id="app">
-        <!-- language -->
         <div class="lang-bar">
             <button class="lang-btn active" data-lang="ru">RU</button>
             <button class="lang-btn" data-lang="en">EN</button>
             <button class="lang-btn" data-lang="kz">KZ</button>
         </div>
 
-        <!-- PACK VIEW -->
         <div id="packView" class="pack-wrapper">
             <div id="packElement" class="pack">
                 <div class="emoji-big">⚽</div>
@@ -345,7 +370,6 @@
             <div id="openPackBtn" class="open-again-btn" style="margin-top:0;">OPEN PACK</div>
         </div>
 
-        <!-- CARD VIEW (hidden initially) -->
         <div id="cardView" class="hidden w-full" style="display: none; flex-direction: column; align-items: center;">
             <div id="cardContainer" class="card-container w-full"></div>
             <div id="screenshotHint" class="screenshot-hint">📸 take a screenshot</div>
@@ -353,10 +377,10 @@
         </div>
     </div>
     <canvas id="fireworks-canvas"></canvas>
+    <a href="admin.html" class="admin-link" target="_blank">⚙️ Admin</a>
 
     <script>
         // ================= CONFIG =================
-        // Rarity weights - now dynamic based on filename pattern
         const RARITY_WEIGHTS = {
             common: 50,
             rare: 30,
@@ -395,71 +419,12 @@
             }
         };
 
-        // ================= CARD DATA =================
-        // AUTO-GENERATED CARDS from images/ folder
-        // Rarity determined by filename pattern:
-        // 001, 002, 003... -> common (with leading zeros, 3+ digits)
-        // 01, 02, 03... -> rare/super_rare (with leading zero, 2 digits)
-        // 1, 2, 3... -> legendary/special (no leading zeros)
-        
-        function generateCards() {
-            const cards = [];
-            const baseUrl = "https://raw.githubusercontent.com/ваш-username/ваш-репозиторий/main/images/";
-            
-            // Generate 100 common cards (001-100)
-            for (let i = 1; i <= 100; i++) {
-                const num = String(i).padStart(3, '0');
-                cards.push({
-                    id: `player_${num}`,
-                    name: `Player ${num}`,
-                    rating: 70 + Math.floor(Math.random() * 15),
-                    position: ['ST', 'CAM', 'CM', 'CB', 'GK', 'LW', 'RW', 'CDM'][Math.floor(Math.random() * 8)],
-                    rarity: 'common',
-                    image: `${baseUrl}${num}.png`,
-                    filename: num
-                });
-            }
-            
-            // Generate 20 rare cards (01-20)
-            for (let i = 1; i <= 20; i++) {
-                const num = String(i).padStart(2, '0');
-                const rarity = i <= 5 ? 'super_rare' : 'rare';
-                cards.push({
-                    id: `player_${num}`,
-                    name: `Star ${num}`,
-                    rating: 82 + Math.floor(Math.random() * 10),
-                    position: ['ST', 'CAM', 'CM', 'LW', 'RW'][Math.floor(Math.random() * 5)],
-                    rarity: rarity,
-                    image: `${baseUrl}${num}.png`,
-                    filename: num
-                });
-            }
-            
-            // Generate 10 legendary cards (1-10)
-            for (let i = 1; i <= 10; i++) {
-                const rarity = i <= 2 ? 'special' : (i <= 5 ? 'legendary' : 'epic');
-                cards.push({
-                    id: `player_${i}`,
-                    name: `Legend ${i}`,
-                    rating: 88 + Math.floor(Math.random() * 8),
-                    position: ['ST', 'CAM', 'LW', 'RW'][Math.floor(Math.random() * 4)],
-                    rarity: rarity,
-                    image: `${baseUrl}${i}.png`,
-                    filename: String(i)
-                });
-            }
-            
-            return cards;
-        }
-
-        const cards = generateCards();
-
         // ================= STATE =================
         let isOpening = false;
         let currentCard = null;
         let currentLang = 'ru';
         let fireworkParticles = [];
-        let dramaticTimeout = null;
+        let cards = [];
 
         // ================= DOM REFS =================
         const packView = document.getElementById('packView');
@@ -474,6 +439,78 @@
         const langBtns = document.querySelectorAll('.lang-btn');
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
+
+        // ================= LOAD CARDS =================
+        async function loadCards() {
+            try {
+                const response = await fetch('cards.json');
+                if (!response.ok) {
+                    throw new Error('cards.json not found');
+                }
+                cards = await response.json();
+                console.log('✅ Cards loaded from cards.json:', cards.length);
+            } catch (error) {
+                console.warn('⚠️ cards.json not found, using default cards');
+                cards = generateDefaultCards();
+                // Save default cards to cards.json
+                try {
+                    const blob = new Blob([JSON.stringify(cards, null, 2)], { type: 'application/json' });
+                    // In a real scenario, you'd use a server to save this
+                    // For now, we'll just use the default cards
+                } catch (e) {}
+            }
+            return cards;
+        }
+
+        function generateDefaultCards() {
+            const defaultCards = [];
+            const baseUrl = "https://raw.githubusercontent.com/ваш-username/ваш-репозиторий/main/images/";
+            
+            // Common cards (001-100)
+            for (let i = 1; i <= 100; i++) {
+                const num = String(i).padStart(3, '0');
+                defaultCards.push({
+                    id: `player_${num}`,
+                    name: `Player ${num}`,
+                    rating: 70 + Math.floor(Math.random() * 15),
+                    position: ['ST', 'CAM', 'CM', 'CB', 'GK', 'LW', 'RW', 'CDM'][Math.floor(Math.random() * 8)],
+                    rarity: 'common',
+                    image: `${baseUrl}${num}.png`,
+                    filename: num
+                });
+            }
+            
+            // Rare cards (01-20)
+            for (let i = 1; i <= 20; i++) {
+                const num = String(i).padStart(2, '0');
+                const rarity = i <= 5 ? 'super_rare' : 'rare';
+                defaultCards.push({
+                    id: `player_${num}`,
+                    name: `Star ${num}`,
+                    rating: 82 + Math.floor(Math.random() * 10),
+                    position: ['ST', 'CAM', 'CM', 'LW', 'RW'][Math.floor(Math.random() * 5)],
+                    rarity: rarity,
+                    image: `${baseUrl}${num}.png`,
+                    filename: num
+                });
+            }
+            
+            // Legendary cards (1-10)
+            for (let i = 1; i <= 10; i++) {
+                const rarity = i <= 2 ? 'special' : (i <= 5 ? 'legendary' : 'epic');
+                defaultCards.push({
+                    id: `player_${i}`,
+                    name: `Legend ${i}`,
+                    rating: 88 + Math.floor(Math.random() * 8),
+                    position: ['ST', 'CAM', 'LW', 'RW'][Math.floor(Math.random() * 4)],
+                    rarity: rarity,
+                    image: `${baseUrl}${i}.png`,
+                    filename: String(i)
+                });
+            }
+            
+            return defaultCards;
+        }
 
         // ================= RNG =================
         function weightedRandom(weights) {
@@ -499,9 +536,7 @@
             return pool[Math.floor(Math.random() * pool.length)];
         }
 
-        // Check if card is "dramatic" (rare with single digit or double zero)
         function isDramaticCard(card) {
-            // Single digit (1-9) or double digit with zero (01-09)
             const num = parseInt(card.filename);
             return (num >= 1 && num <= 9) || (card.filename.length === 2 && card.filename.startsWith('0'));
         }
@@ -509,41 +544,38 @@
         // ================= PACK OPENING =================
         function openPack() {
             if (isOpening) return;
+            if (cards.length === 0) {
+                alert('No cards available! Please check cards.json');
+                return;
+            }
+            
             isOpening = true;
             currentCard = null;
             packElement.classList.add('opening');
             openPackBtn.style.pointerEvents = 'none';
             
-            // hide card view
             cardView.style.display = 'none';
             packView.style.display = 'flex';
 
-            // update text
-            packLabel.textContent = translations[currentLang].loading || '...';
+            packLabel.innerHTML = `<div class="pack-loading-text"><span class="loading-spinner"></span> ${translations[currentLang].loading}</div>`;
             packSub.textContent = '';
 
-            // Shake + flash
             packElement.classList.remove('shake', 'flash', 'dramatic-loading');
             void packElement.offsetWidth;
             packElement.classList.add('shake');
             
-            // First determine rarity
             const rarity = rollRarity();
             const card = rollPlayer(rarity);
             currentCard = card;
             
-            // Check if dramatic loading needed
             const isDramatic = isDramaticCard(card);
-            
-            let revealDelay = 1000; // normal delay
+            let revealDelay = 1000;
             
             if (isDramatic) {
-                // Dramatic loading for special cards
                 packElement.classList.add('dramatic-loading');
-                packLabel.textContent = translations[currentLang].dramaticLoading || 'Loading...';
-                revealDelay = 2500; // 2.5 seconds dramatic pause
+                packLabel.innerHTML = `<div class="pack-loading-text"><span class="loading-spinner"></span> ${translations[currentLang].dramaticLoading}</div>`;
+                revealDelay = 2500;
                 
-                // Add extra flash effects during dramatic loading
                 setTimeout(() => {
                     packElement.classList.add('flash');
                 }, 1000);
@@ -558,7 +590,6 @@
                 }, 2300);
             }
             
-            // Normal shake duration
             setTimeout(() => {
                 packElement.classList.remove('shake');
                 if (!isDramatic) {
@@ -566,13 +597,11 @@
                 }
             }, 500);
             
-            // REVEAL
             setTimeout(() => {
                 packElement.classList.remove('flash', 'dramatic-loading');
                 showCard(card);
                 launchFireworks(card.rarity, isDramatic);
                 
-                // reset pack UI
                 packLabel.textContent = translations[currentLang].packLabel || 'PACK';
                 packSub.textContent = '';
                 packElement.classList.remove('opening');
@@ -593,10 +622,8 @@
             };
             const cls = rarityMap[card.rarity] || 'common';
             const rarityLabel = card.rarity.replace('_', ' ').toUpperCase();
-
-            // Special animation for dramatic cards
             const dramaticClass = isDramaticCard(card) ? 'card-dramatic' : '';
-            
+
             cardContainer.innerHTML = `
                 <div class="player-card ${cls} ${dramaticClass}" style="${isDramaticCard(card) ? 'animation: cardDramaticAppear 1s cubic-bezier(0.2, 0.9, 0.3, 1.1);' : ''}">
                     <div class="card-rarity-badge">${rarityLabel}</div>
@@ -612,21 +639,7 @@
                     <div class="rarity-label">${rarityLabel}</div>
                 </div>
             `;
-            
-            // Add dramatic style if needed
-            if (isDramaticCard(card)) {
-                const style = document.createElement('style');
-                style.textContent = `
-                    @keyframes cardDramaticAppear {
-                        0% { opacity: 0; transform: scale(0.5) rotate(-5deg); filter: blur(10px); }
-                        50% { opacity: 0.5; transform: scale(1.1) rotate(2deg); filter: blur(2px); }
-                        100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
 
-            // fix img fallback
             const img = cardContainer.querySelector('img');
             if (img) {
                 img.onerror = function() {
@@ -636,16 +649,13 @@
                 };
             }
 
-            // update screenshot hint
             screenshotHint.textContent = '📸 ' + translations[currentLang].screenshot;
-            // switch view
             packView.style.display = 'none';
             cardView.style.display = 'flex';
-            // update open again text
             openAgainBtn.textContent = translations[currentLang].openAgain;
         }
 
-        // ================= FIREWORKS (canvas) =================
+        // ================= FIREWORKS =================
         function launchFireworks(rarity, isDramatic = false) {
             const intensity = { common: 1, rare: 1.5, super_rare: 2, epic: 3, legendary: 4, special: 5 };
             const multiplier = isDramatic ? 2 : 1;
@@ -654,8 +664,6 @@
             const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a29bfe', '#fd79a8', '#fdcb6e', '#ff9ff3', '#48dbfb'];
             const cx = window.innerWidth / 2;
             const cy = window.innerHeight / 2;
-
-            // More dramatic spread for special cards
             const spread = isDramatic ? 120 : 60;
 
             for (let i = 0; i < count; i++) {
@@ -672,11 +680,9 @@
                     size: size,
                     color: colors[Math.floor(Math.random() * colors.length)],
                     gravity: 0.03 + Math.random() * 0.05,
-                    trail: isDramatic ? [] : null,
                 });
             }
             
-            // Add extra sparkle for dramatic cards
             if (isDramatic) {
                 for (let i = 0; i < 30; i++) {
                     const angle = Math.random() * 2 * Math.PI;
@@ -755,16 +761,12 @@
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.lang === lang);
             });
-            // update UI texts
             openPackBtn.textContent = translations[lang].openPack;
             openAgainBtn.textContent = translations[lang].openAgain;
             screenshotHint.textContent = '📸 ' + translations[lang].screenshot;
             packLabel.textContent = translations[lang].packLabel || 'PACK';
             if (!cardView.style.display || cardView.style.display === 'none') {
                 packSub.textContent = '';
-            }
-            if (currentCard) {
-                // keep card as is
             }
             try { localStorage.setItem('pack_lang', lang); } catch(e){}
         }
@@ -773,7 +775,7 @@
         openPackBtn.addEventListener('click', openPack);
         packElement.addEventListener('click', openPack);
         openAgainBtn.addEventListener('click', () => {
-            // reset to pack
+            // Reset to pack - allow opening again immediately
             cardView.style.display = 'none';
             packView.style.display = 'flex';
             packElement.classList.remove('opening', 'dramatic-loading');
@@ -781,13 +783,16 @@
             currentCard = null;
             packLabel.textContent = translations[currentLang].packLabel || 'PACK';
             packSub.textContent = '';
-            // clear fireworks
+            
             fireworkParticles = [];
             if (window._fireworkAnim) {
                 cancelAnimationFrame(window._fireworkAnim);
                 window._fireworkAnim = null;
             }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Enable opening again immediately
+            isOpening = false;
         });
 
         langBtns.forEach(btn => {
@@ -797,29 +802,31 @@
             });
         });
 
-        // load saved language
-        try {
-            const saved = localStorage.getItem('pack_lang');
-            if (saved && translations[saved]) {
-                setLanguage(saved);
-            } else {
-                setLanguage('ru');
-            }
-        } catch(e){ setLanguage('ru'); }
-
         // ================= INIT =================
-        setLanguage(currentLang);
-        isOpening = false;
-        packElement.classList.remove('opening');
+        async function init() {
+            await loadCards();
+            try {
+                const saved = localStorage.getItem('pack_lang');
+                if (saved && translations[saved]) {
+                    setLanguage(saved);
+                } else {
+                    setLanguage('ru');
+                }
+            } catch(e){ setLanguage('ru'); }
+            
+            isOpening = false;
+            packElement.classList.remove('opening');
+            console.log('⚽ PACK game ready!');
+            console.log('📊 Cards loaded:', cards.length);
+            console.log('📊 Common:', cards.filter(c => c.rarity === 'common').length);
+            console.log('📊 Rare:', cards.filter(c => c.rarity === 'rare').length);
+            console.log('📊 Super Rare:', cards.filter(c => c.rarity === 'super_rare').length);
+            console.log('📊 Epic:', cards.filter(c => c.rarity === 'epic').length);
+            console.log('📊 Legendary:', cards.filter(c => c.rarity === 'legendary').length);
+            console.log('📊 Special:', cards.filter(c => c.rarity === 'special').length);
+        }
 
-        console.log('⚽ PACK game ready!');
-        console.log('📁 Cards generated:', cards.length);
-        console.log('📊 Common:', cards.filter(c => c.rarity === 'common').length);
-        console.log('📊 Rare:', cards.filter(c => c.rarity === 'rare').length);
-        console.log('📊 Super Rare:', cards.filter(c => c.rarity === 'super_rare').length);
-        console.log('📊 Epic:', cards.filter(c => c.rarity === 'epic').length);
-        console.log('📊 Legendary:', cards.filter(c => c.rarity === 'legendary').length);
-        console.log('📊 Special:', cards.filter(c => c.rarity === 'special').length);
+        init();
     </script>
 </body>
 </html>
