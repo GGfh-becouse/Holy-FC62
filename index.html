@@ -271,14 +271,6 @@
             border-radius: 20px 4px 20px 4px;
             pointer-events: none;
         }
-        .player-card.common::after {
-            content: '✦';
-            position: absolute;
-            bottom: 12px;
-            right: 16px;
-            font-size: 1.2rem;
-            opacity: 0.15;
-        }
         
         /* RARE - Enhanced metallic */
         .player-card.rare {
@@ -620,7 +612,6 @@
             legendary: 2.5,
             special: 0.5
         };
-        const RARITY_ORDER = ['common', 'rare', 'super_rare', 'epic', 'legendary', 'special'];
 
         // ================= TRANSLATIONS =================
         const translations = {
@@ -663,35 +654,43 @@
             { id: "p008", name: "Roberto Ferrari", rating: 68, position: "GK", rarity: "common" },
             { id: "p009", name: "Paolo Esposito", rating: 76, position: "CM", rarity: "common" },
             { id: "p010", name: "Daniele Colombo", rating: 73, position: "ST", rarity: "common" },
+            { id: "p011", name: "Andrea Pirlo", rating: 74, position: "CM", rarity: "common" },
+            { id: "p012", name: "Gennaro Gattuso", rating: 72, position: "CDM", rarity: "common" },
             
             // RARE (улучшенный металлик)
-            { id: "p011", name: "Nicolo Barella", rating: 82, position: "CM", rarity: "rare" },
-            { id: "p012", name: "Federico Chiesa", rating: 83, position: "RW", rarity: "rare" },
-            { id: "p013", name: "Gianluigi Donnarumma", rating: 84, position: "GK", rarity: "rare" },
-            { id: "p014", name: "Alessandro Bastoni", rating: 81, position: "CB", rarity: "rare" },
-            { id: "p015", name: "Manuel Locatelli", rating: 80, position: "CDM", rarity: "rare" },
+            { id: "p013", name: "Nicolo Barella", rating: 82, position: "CM", rarity: "rare" },
+            { id: "p014", name: "Federico Chiesa", rating: 83, position: "RW", rarity: "rare" },
+            { id: "p015", name: "Gianluigi Donnarumma", rating: 84, position: "GK", rarity: "rare" },
+            { id: "p016", name: "Alessandro Bastoni", rating: 81, position: "CB", rarity: "rare" },
+            { id: "p017", name: "Manuel Locatelli", rating: 80, position: "CDM", rarity: "rare" },
+            { id: "p018", name: "Domenico Berardi", rating: 82, position: "RW", rarity: "rare" },
+            { id: "p019", name: "Ciro Immobile", rating: 83, position: "ST", rarity: "rare" },
             
             // SUPER RARE (сильный глоу)
-            { id: "p016", name: "Lautaro Martinez", rating: 86, position: "ST", rarity: "super_rare" },
-            { id: "p017", name: "Rafael Leao", rating: 85, position: "LW", rarity: "super_rare" },
-            { id: "p018", name: "Theo Hernandez", rating: 84, position: "LB", rarity: "super_rare" },
-            { id: "p019", name: "Mike Maignan", rating: 85, position: "GK", rarity: "super_rare" },
+            { id: "p020", name: "Lautaro Martinez", rating: 86, position: "ST", rarity: "super_rare" },
+            { id: "p021", name: "Rafael Leao", rating: 85, position: "LW", rarity: "super_rare" },
+            { id: "p022", name: "Theo Hernandez", rating: 84, position: "LB", rarity: "super_rare" },
+            { id: "p023", name: "Mike Maignan", rating: 85, position: "GK", rarity: "super_rare" },
+            { id: "p024", name: "Nicolo Zaniolo", rating: 84, position: "CAM", rarity: "super_rare" },
             
             // EPIC (фиолетовые)
-            { id: "p020", name: "Victor Osimhen", rating: 88, position: "ST", rarity: "epic" },
-            { id: "p021", name: "Khvicha Kvaratskhelia", rating: 87, position: "LW", rarity: "epic" },
-            { id: "p022", name: "Kim Min-jae", rating: 86, position: "CB", rarity: "epic" },
-            { id: "p023", name: "Andre Onana", rating: 87, position: "GK", rarity: "epic" },
+            { id: "p025", name: "Victor Osimhen", rating: 88, position: "ST", rarity: "epic" },
+            { id: "p026", name: "Khvicha Kvaratskhelia", rating: 87, position: "LW", rarity: "epic" },
+            { id: "p027", name: "Kim Min-jae", rating: 86, position: "CB", rarity: "epic" },
+            { id: "p028", name: "Andre Onana", rating: 87, position: "GK", rarity: "epic" },
+            { id: "p029", name: "Sergej Milinkovic-Savic", rating: 88, position: "CM", rarity: "epic" },
             
             // LEGENDARY (бело-золотые)
-            { id: "p024", name: "Leonardo Bonucci", rating: 91, position: "CB", rarity: "legendary" },
-            { id: "p025", name: "Marco Verratti", rating: 90, position: "CM", rarity: "legendary" },
-            { id: "p026", name: "Lorenzo Insigne", rating: 89, position: "LW", rarity: "legendary" },
+            { id: "p030", name: "Leonardo Bonucci", rating: 91, position: "CB", rarity: "legendary" },
+            { id: "p031", name: "Marco Verratti", rating: 90, position: "CM", rarity: "legendary" },
+            { id: "p032", name: "Lorenzo Insigne", rating: 89, position: "LW", rarity: "legendary" },
+            { id: "p033", name: "Giorgio Chiellini", rating: 90, position: "CB", rarity: "legendary" },
             
             // SPECIAL (уникальные)
-            { id: "p027", name: "Francesco Totti", rating: 95, position: "CAM", rarity: "special" },
-            { id: "p028", name: "Paolo Maldini", rating: 94, position: "CB", rarity: "special" },
-            { id: "p029", name: "Alessandro Del Piero", rating: 93, position: "ST", rarity: "special" }
+            { id: "p034", name: "Francesco Totti", rating: 95, position: "CAM", rarity: "special" },
+            { id: "p035", name: "Paolo Maldini", rating: 94, position: "CB", rarity: "special" },
+            { id: "p036", name: "Alessandro Del Piero", rating: 93, position: "ST", rarity: "special" },
+            { id: "p037", name: "Roberto Baggio", rating: 94, position: "CAM", rarity: "special" }
         ];
 
         // ================= STATE =================
@@ -699,6 +698,7 @@
         let currentCard = null;
         let currentLang = 'ru';
         let fireworkParticles = [];
+        let animationFrame = null;
 
         // ================= DOM REFS =================
         const packView = document.getElementById('packView');
@@ -813,15 +813,6 @@
 
         // ================= RENDER CARD =================
         function renderCard(card) {
-            const rarityMap = {
-                common: 'common',
-                rare: 'rare',
-                super_rare: 'super-rare',
-                epic: 'epic',
-                legendary: 'legendary',
-                special: 'special'
-            };
-            const cls = rarityMap[card.rarity] || 'common';
             const rarityLabel = card.rarity.replace('_', ' ').toUpperCase();
             const isDramatic = isDramaticCard(card);
             
@@ -836,11 +827,10 @@
             };
             const decor = decorMap[card.rarity] || '⚽';
             
-            // Background pattern (CSS will handle)
             const dramaticClass = isDramatic ? 'card-dramatic' : '';
             
             cardContainer.innerHTML = `
-                <div class="player-card ${cls} ${dramaticClass}">
+                <div class="player-card ${card.rarity} ${dramaticClass}">
                     <div class="card-top">
                         <div class="card-rating">${card.rating}</div>
                         <div class="card-position">${card.position}</div>
@@ -910,9 +900,11 @@
             }
             
             fireworkParticles = particles;
-            if (!window._fireworkAnim) {
-                window._fireworkAnim = requestAnimationFrame(drawFireworks);
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
             }
+            drawFireworks();
         }
 
         function drawFireworks() {
@@ -947,10 +939,10 @@
             ctx.shadowBlur = 0;
             ctx.globalAlpha = 1;
             if (alive) {
-                window._fireworkAnim = requestAnimationFrame(drawFireworks);
+                animationFrame = requestAnimationFrame(drawFireworks);
             } else {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                window._fireworkAnim = null;
+                animationFrame = null;
                 fireworkParticles = [];
             }
         }
@@ -991,9 +983,9 @@
             packSub.textContent = '';
             
             fireworkParticles = [];
-            if (window._fireworkAnim) {
-                cancelAnimationFrame(window._fireworkAnim);
-                window._fireworkAnim = null;
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
             }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             isOpening = false;
@@ -1020,7 +1012,7 @@
             isOpening = false;
             packElement.classList.remove('opening');
             console.log('⚽ PACK game ready!');
-            console.log('📊 Cards loaded:', cards.length);
+            console.log('📊 Total cards:', cards.length);
             console.log('📊 Common:', cards.filter(c => c.rarity === 'common').length);
             console.log('📊 Rare:', cards.filter(c => c.rarity === 'rare').length);
             console.log('📊 Super Rare:', cards.filter(c => c.rarity === 'super_rare').length);
