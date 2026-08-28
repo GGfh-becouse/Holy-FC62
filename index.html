@@ -301,29 +301,28 @@
         };
 
         // ================= IMAGE LIST =================
-        // Просто список всех PNG в папке images
-        // Чтобы добавить новую картинку - просто добавь сюда имя файла
+        // Укажи здесь ВСЕ файлы из папки images с их расширениями
         const images = [
-            "1.png",
-            "2.png",
-            "3.png",
-            "4.png",
-            "5.png",
-            "6.png",
-            "7.png",
-            "8.png",
-            "9.png",
-            "10.png",
-            "11.png",
-            "12.png",
-            "13.png",
-            "14.png",
-            "15.png",
-            "16.png",
-            "17.png",
-            "18.png",
-            "19.png",
-            "20.png"
+            "1.jpg",
+            "2.jpg",
+            "3.jpg",
+            "4.jpg",
+            "5.jpg",
+            "6.jpg",
+            "7.jpg",
+            "8.jpg",
+            "9.jpg",
+            "10.jpg",
+            "11.jpg",
+            "12.jpg",
+            "13.jpg",
+            "14.jpg",
+            "15.jpg",
+            "16.jpg",
+            "17.jpg",
+            "18.jpg",
+            "19.jpg",
+            "20.jpg"
         ];
 
         // ================= STATE =================
@@ -349,6 +348,7 @@
 
         // ================= FUNCTIONS =================
         function getRandomImage() {
+            if (images.length === 0) return null;
             const randomIndex = Math.floor(Math.random() * images.length);
             return images[randomIndex];
         }
@@ -361,7 +361,7 @@
         function openPack() {
             if (isOpening) return;
             if (images.length === 0) {
-                alert('No images in the folder!');
+                alert('No images in the folder! Add images to the "images" folder and update the list.');
                 return;
             }
             
@@ -370,6 +370,7 @@
             packElement.classList.add('opening');
             openPackBtn.style.pointerEvents = 'none';
             
+            // Скрываем картинку, показываем пак
             imageView.style.display = 'none';
             packView.style.display = 'flex';
 
@@ -402,18 +403,23 @@
 
         // ================= SHOW IMAGE =================
         function showImage(filename) {
+            if (!filename) {
+                imageContainer.innerHTML = `<div class="error-placeholder">⚠️ No image available</div>`;
+                return;
+            }
+            
             const imagePath = getImagePath(filename);
             
             imageContainer.innerHTML = `
                 <img src="${imagePath}" 
-                     alt="Card ${filename}" 
+                     alt="Card" 
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="error-placeholder" style="display:none;">
-                    ⚠️ Image not found
+                    ⚠️ Image not found<br>
+                    <span style="font-size:0.7rem;opacity:0.5;">${filename}</span>
                 </div>
             `;
 
-            // Проверяем, загрузилась ли картинка
             const img = imageContainer.querySelector('img');
             if (img) {
                 img.onload = function() {
@@ -424,6 +430,8 @@
                     this.style.display = 'none';
                     const placeholder = this.nextElementSibling;
                     if (placeholder) placeholder.style.display = 'flex';
+                    // Все равно запускаем фейерверки, но с задержкой
+                    setTimeout(launchFireworks, 300);
                 };
             }
 
@@ -562,6 +570,7 @@
             packElement.classList.remove('opening');
             console.log('⚽ PACK ready!');
             console.log('📁 Images found:', images.length);
+            console.log('📁 Images list:', images);
         }
 
         init();
