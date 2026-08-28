@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⚽ PACK · футбольная карточка</title>
+    <title>⚽ PACK · открой картинку</title>
     <style>
-        /* RESET */
         * {
             margin: 0;
             padding: 0;
@@ -34,7 +33,6 @@
             position: relative;
         }
         
-        /* LANGUAGE */
         .lang-bar {
             width: 100%;
             display: flex;
@@ -65,7 +63,6 @@
         }
         .lang-btn:active { opacity: 0.6; }
         
-        /* PACK */
         .pack-wrapper {
             display: flex;
             flex-direction: column;
@@ -138,16 +135,8 @@
             100% { box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         }
         .pack.opening { pointer-events: none; }
-        .pack.dramatic-loading {
-            animation: dramaticPulse 2s ease-in-out infinite;
-        }
-        @keyframes dramaticPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255,215,0,0.1); }
-            50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(255,215,0,0.4), 0 0 120px rgba(255,200,50,0.2); }
-        }
 
-        /* CARD CONTAINER */
-        .card-container {
+        .image-container {
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -155,357 +144,33 @@
             justify-content: center;
             margin: 8px 0;
         }
-        
-        /* PLAYER CARD - BASE */
-        .player-card {
+        .image-container img {
             width: 100%;
             max-width: 380px;
-            aspect-ratio: 2.8/4;
             border-radius: 24px 8px 24px 8px;
-            padding: 20px 18px;
-            position: relative;
-            overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            animation: cardAppear 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            animation: imageAppear 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            display: block;
+            background: #15222e;
         }
-        
-        @keyframes cardAppear {
-            0% { opacity: 0; transform: scale(0.8) translateY(30px) rotate(-3deg); }
-            100% { opacity: 1; transform: scale(1) translateY(0) rotate(0deg); }
-        }
-        
-        /* CARD TOP SECTION */
-        .card-top {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            position: relative;
-            z-index: 2;
-        }
-        .card-rating {
-            font-size: 3.2rem;
-            font-weight: 800;
-            line-height: 1;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            letter-spacing: -1px;
-        }
-        .card-position {
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            opacity: 0.8;
-            margin-top: 2px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        /* CARD CENTER - decorative */
-        .card-center {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 2;
-            margin: 8px 0;
-        }
-        .card-center .decor {
-            font-size: 4.5rem;
-            opacity: 0.15;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
-        }
-        .card-center .decor-text {
-            font-size: 2.8rem;
-            font-weight: 900;
-            opacity: 0.08;
-            letter-spacing: 8px;
-            position: absolute;
-        }
-        
-        /* CARD BOTTOM */
-        .card-bottom {
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-        .card-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            letter-spacing: 0.5px;
-            line-height: 1.2;
-            margin-bottom: 4px;
-        }
-        .card-rarity-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            opacity: 0.7;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        /* ===== RARITY STYLES ===== */
-        
-        /* COMMON - Gold base */
-        .player-card.common {
-            background: linear-gradient(145deg, #c9a84c, #a8892e);
-            border: 2px solid #dbb95c;
-            color: #2a1f0a;
-        }
-        .player-card.common .card-rating { color: #1a1408; }
-        .player-card.common .card-position { color: #1a1408; }
-        .player-card.common .card-name { color: #1a1408; }
-        .player-card.common .card-rarity-label { color: #1a1408; }
-        .player-card.common .decor { color: #2a1f0a; }
-        .player-card.common .decor-text { color: #2a1f0a; }
-        .player-card.common::before {
-            content: '';
-            position: absolute;
-            inset: 4px;
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 20px 4px 20px 4px;
-            pointer-events: none;
-        }
-        
-        /* RARE - Enhanced metallic */
-        .player-card.rare {
-            background: linear-gradient(145deg, #d4af37, #b8942a);
-            border: 2px solid #f0d060;
-            color: #1a1408;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3), 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .player-card.rare .card-rating { color: #1a1408; }
-        .player-card.rare .card-position { color: #1a1408; }
-        .player-card.rare .card-name { color: #1a1408; }
-        .player-card.rare .card-rarity-label { color: #1a1408; }
-        .player-card.rare::before {
-            content: '';
-            position: absolute;
-            inset: 4px;
-            border: 2px solid rgba(255,215,0,0.4);
-            border-radius: 20px 4px 20px 4px;
-            pointer-events: none;
-            box-shadow: inset 0 0 20px rgba(255,215,0,0.1);
-        }
-        .player-card.rare .card-center .decor {
-            font-size: 5rem;
-            opacity: 0.2;
-        }
-        
-        /* SUPER RARE - Strong glow + geometric */
-        .player-card.super-rare {
-            background: linear-gradient(145deg, #e8c84a, #c9a832);
-            border: 2px solid #ffdd55;
-            color: #1a1408;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5), 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .player-card.super-rare .card-rating { color: #1a1408; }
-        .player-card.super-rare .card-position { color: #1a1408; }
-        .player-card.super-rare .card-name { color: #1a1408; }
-        .player-card.super-rare .card-rarity-label { color: #1a1408; }
-        .player-card.super-rare::before {
-            content: '';
-            position: absolute;
-            inset: 3px;
-            border: 3px solid rgba(255,215,0,0.5);
-            border-radius: 22px 6px 22px 6px;
-            pointer-events: none;
-            box-shadow: inset 0 0 30px rgba(255,215,0,0.2);
-        }
-        .player-card.super-rare::after {
-            content: '◆ ◇ ◆';
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            font-size: 0.8rem;
-            opacity: 0.3;
-            letter-spacing: 4px;
-        }
-        
-        /* EPIC - Purple */
-        .player-card.epic {
-            background: linear-gradient(145deg, #4a1a5e, #2d0a3e);
-            border: 2px solid #8b4c9e;
-            color: #e8d0f0;
-            box-shadow: 0 0 60px rgba(139, 76, 158, 0.5), 0 20px 40px rgba(0,0,0,0.7);
-        }
-        .player-card.epic .card-rating { color: #e8d0f0; }
-        .player-card.epic .card-position { color: #c8a8d8; }
-        .player-card.epic .card-name { color: #f0e0f8; }
-        .player-card.epic .card-rarity-label { color: #c8a8d8; }
-        .player-card.epic .decor { color: #8b4c9e; opacity: 0.3; }
-        .player-card.epic .decor-text { color: #8b4c9e; opacity: 0.1; }
-        .player-card.epic::before {
-            content: '';
-            position: absolute;
-            inset: 3px;
-            border: 2px solid rgba(139, 76, 158, 0.4);
-            border-radius: 22px 6px 22px 6px;
-            pointer-events: none;
-            box-shadow: inset 0 0 40px rgba(139, 76, 158, 0.2);
-        }
-        .player-card.epic .card-center .decor {
-            font-size: 5.5rem;
-            opacity: 0.2;
-        }
-        
-        /* LEGENDARY - White/Gold premium */
-        .player-card.legendary {
-            background: linear-gradient(145deg, #f8f4ee, #e8e0d8);
-            border: 3px solid #d4af37;
-            color: #1a1408;
-            box-shadow: 0 0 80px rgba(212, 175, 55, 0.6), 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .player-card.legendary .card-rating { 
-            color: #8a6d1b;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-        }
-        .player-card.legendary .card-position { 
-            color: #8a6d1b;
-        }
-        .player-card.legendary .card-name { 
-            color: #1a1408;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
-        .player-card.legendary .card-rarity-label { 
-            color: #8a6d1b;
-        }
-        .player-card.legendary .decor { 
-            color: #d4af37;
-            opacity: 0.25;
-        }
-        .player-card.legendary .decor-text { 
-            color: #d4af37;
-            opacity: 0.08;
-        }
-        .player-card.legendary::before {
-            content: '';
-            position: absolute;
-            inset: 3px;
-            border: 3px solid rgba(212, 175, 55, 0.5);
-            border-radius: 22px 6px 22px 6px;
-            pointer-events: none;
-            box-shadow: 
-                inset 0 0 50px rgba(212, 175, 55, 0.15),
-                0 0 60px rgba(212, 175, 55, 0.2);
-        }
-        .player-card.legendary::after {
-            content: '✦ ✧ ✦';
-            position: absolute;
-            bottom: 8px;
-            right: 12px;
-            font-size: 1rem;
-            color: #d4af37;
-            opacity: 0.3;
-            letter-spacing: 6px;
-        }
-        .player-card.legendary .card-center .decor {
-            font-size: 6rem;
-            opacity: 0.15;
-        }
-        .player-card.legendary .card-rarity-label {
-            color: #8a6d1b;
-            font-weight: 700;
-        }
-        
-        /* SPECIAL - Unique design */
-        .player-card.special {
-            background: linear-gradient(145deg, #1a0a2e, #2d0a4e);
-            border: 3px solid #ff6b9d;
-            color: #f0e8f8;
-            box-shadow: 0 0 100px rgba(255, 107, 157, 0.5), 0 20px 40px rgba(0,0,0,0.7);
-            animation: specialGlow 3s ease-in-out infinite;
-        }
-        @keyframes specialGlow {
-            0%, 100% { box-shadow: 0 0 100px rgba(255, 107, 157, 0.5), 0 20px 40px rgba(0,0,0,0.7); }
-            50% { box-shadow: 0 0 150px rgba(255, 107, 157, 0.8), 0 0 200px rgba(255, 50, 100, 0.3), 0 20px 40px rgba(0,0,0,0.7); }
-        }
-        .player-card.special .card-rating { 
-            color: #ff6b9d;
-            text-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
-        }
-        .player-card.special .card-position { 
-            color: #ff9bbd;
-        }
-        .player-card.special .card-name { 
-            color: #f0e8f8;
-            text-shadow: 0 0 20px rgba(255, 107, 157, 0.2);
-        }
-        .player-card.special .card-rarity-label { 
-            color: #ff9bbd;
-        }
-        .player-card.special .decor { 
-            color: #ff6b9d;
-            opacity: 0.3;
-        }
-        .player-card.special .decor-text { 
-            color: #ff6b9d;
-            opacity: 0.1;
-        }
-        .player-card.special::before {
-            content: '';
-            position: absolute;
-            inset: 3px;
-            border: 3px solid rgba(255, 107, 157, 0.4);
-            border-radius: 22px 6px 22px 6px;
-            pointer-events: none;
-            box-shadow: 
-                inset 0 0 60px rgba(255, 107, 157, 0.2),
-                0 0 80px rgba(255, 107, 157, 0.2);
-        }
-        .player-card.special::after {
-            content: '✦ ✦ ✦';
-            position: absolute;
-            bottom: 8px;
-            right: 12px;
-            font-size: 0.9rem;
-            color: #ff6b9d;
-            opacity: 0.4;
-            letter-spacing: 8px;
-        }
-        .player-card.special .card-center .decor {
-            font-size: 6.5rem;
-            opacity: 0.15;
-            animation: specialSpin 10s linear infinite;
-        }
-        @keyframes specialSpin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @keyframes imageAppear {
+            0% { opacity: 0; transform: scale(0.8) translateY(30px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* DRAMATIC CARD APPEAR */
-        .card-dramatic {
-            animation: cardDramaticAppear 1.2s cubic-bezier(0.2, 0.9, 0.3, 1.1) !important;
-        }
-        @keyframes cardDramaticAppear {
-            0% { opacity: 0; transform: scale(0.5) rotate(-5deg); filter: blur(10px); }
-            40% { opacity: 0.3; transform: scale(1.1) rotate(2deg); filter: blur(2px); }
-            70% { opacity: 0.8; transform: scale(0.95) rotate(-1deg); filter: blur(0); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
-        }
-
-        /* SCREENSHOT HINT */
         .screenshot-hint {
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.15);
             text-align: center;
             letter-spacing: 0.8px;
             padding: 8px 0 2px;
-            transition: opacity 0.3s;
             background: transparent;
             border: none;
             width: 100%;
             cursor: default;
             user-select: none;
         }
-        .screenshot-hint:active { opacity: 0.5; }
 
-        /* OPEN AGAIN BUTTON */
         .open-again-btn {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -525,7 +190,6 @@
         }
         .open-again-btn:active { transform: scale(0.94); background: rgba(255,255,255,0.08); }
 
-        /* FIREWORKS CANVAS */
         #fireworks-canvas {
             position: fixed;
             top: 0;
@@ -539,7 +203,6 @@
         .hidden { display: none !important; }
         .w-full { width: 100%; }
 
-        /* LOADING SPINNER */
         .loading-spinner {
             display: inline-block;
             width: 20px;
@@ -560,19 +223,28 @@
             gap: 8px;
         }
 
-        /* RESPONSIVE */
         @media (max-width: 480px) {
             .pack { width: 170px; height: 210px; }
             .pack .emoji-big { font-size: 3.6rem; }
-            .player-card { max-width: 340px; }
-            .card-rating { font-size: 2.8rem; }
-            .card-name { font-size: 1.3rem; }
-            .card-position { font-size: 1rem; }
             .lang-bar { font-size: 0.8rem; }
         }
         @media (min-width: 800px) {
             body { padding: 40px; }
-            .player-card { max-width: 420px; }
+        }
+
+        .error-placeholder {
+            width: 100%;
+            max-width: 380px;
+            aspect-ratio: 1/0.9;
+            background: #1a2733;
+            border-radius: 24px 8px 24px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.2);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
     </style>
 </head>
@@ -594,8 +266,8 @@
             <div id="openPackBtn" class="open-again-btn" style="margin-top:0;">OPEN PACK</div>
         </div>
 
-        <div id="cardView" class="hidden w-full" style="display: none; flex-direction: column; align-items: center;">
-            <div id="cardContainer" class="card-container w-full"></div>
+        <div id="imageView" class="hidden w-full" style="display: none; flex-direction: column; align-items: center;">
+            <div id="imageContainer" class="image-container w-full"></div>
             <div id="screenshotHint" class="screenshot-hint">📸 take a screenshot</div>
             <div id="openAgainBtn" class="open-again-btn">OPEN AGAIN</div>
         </div>
@@ -603,16 +275,6 @@
     <canvas id="fireworks-canvas"></canvas>
 
     <script>
-        // ================= CONFIG =================
-        const RARITY_WEIGHTS = {
-            common: 50,
-            rare: 30,
-            super_rare: 12,
-            epic: 5,
-            legendary: 2.5,
-            special: 0.5
-        };
-
         // ================= TRANSLATIONS =================
         const translations = {
             ru: {
@@ -620,256 +282,172 @@
                 openAgain: "Открыть снова",
                 screenshot: "Сделай скриншот",
                 loading: "Открытие...",
-                packLabel: "PACK",
-                dramaticLoading: "Загрузка..."
+                packLabel: "PACK"
             },
             en: {
                 openPack: "Open Pack",
                 openAgain: "Open Again",
                 screenshot: "Take a screenshot",
                 loading: "Opening...",
-                packLabel: "PACK",
-                dramaticLoading: "Loading..."
+                packLabel: "PACK"
             },
             kz: {
                 openPack: "Пакетті ашу",
                 openAgain: "Қайта ашу",
                 screenshot: "Скриншот жаса",
                 loading: "Ашылуда...",
-                packLabel: "PACK",
-                dramaticLoading: "Жүктелуде..."
+                packLabel: "PACK"
             }
         };
 
-        // ================= CARD DATA =================
-        const cards = [
-            // COMMON (золотые)
-            { id: "p001", name: "Marco Rossi", rating: 73, position: "CM", rarity: "common" },
-            { id: "p002", name: "Luca Bianchi", rating: 71, position: "ST", rarity: "common" },
-            { id: "p003", name: "Matteo Romano", rating: 75, position: "CAM", rarity: "common" },
-            { id: "p004", name: "Alessandro Russo", rating: 69, position: "CDM", rarity: "common" },
-            { id: "p005", name: "Francesco Costa", rating: 72, position: "LW", rarity: "common" },
-            { id: "p006", name: "Giuseppe Bruno", rating: 74, position: "RW", rarity: "common" },
-            { id: "p007", name: "Antonio Ricci", rating: 70, position: "CB", rarity: "common" },
-            { id: "p008", name: "Roberto Ferrari", rating: 68, position: "GK", rarity: "common" },
-            { id: "p009", name: "Paolo Esposito", rating: 76, position: "CM", rarity: "common" },
-            { id: "p010", name: "Daniele Colombo", rating: 73, position: "ST", rarity: "common" },
-            { id: "p011", name: "Andrea Pirlo", rating: 74, position: "CM", rarity: "common" },
-            { id: "p012", name: "Gennaro Gattuso", rating: 72, position: "CDM", rarity: "common" },
-            
-            // RARE (улучшенный металлик)
-            { id: "p013", name: "Nicolo Barella", rating: 82, position: "CM", rarity: "rare" },
-            { id: "p014", name: "Federico Chiesa", rating: 83, position: "RW", rarity: "rare" },
-            { id: "p015", name: "Gianluigi Donnarumma", rating: 84, position: "GK", rarity: "rare" },
-            { id: "p016", name: "Alessandro Bastoni", rating: 81, position: "CB", rarity: "rare" },
-            { id: "p017", name: "Manuel Locatelli", rating: 80, position: "CDM", rarity: "rare" },
-            { id: "p018", name: "Domenico Berardi", rating: 82, position: "RW", rarity: "rare" },
-            { id: "p019", name: "Ciro Immobile", rating: 83, position: "ST", rarity: "rare" },
-            
-            // SUPER RARE (сильный глоу)
-            { id: "p020", name: "Lautaro Martinez", rating: 86, position: "ST", rarity: "super_rare" },
-            { id: "p021", name: "Rafael Leao", rating: 85, position: "LW", rarity: "super_rare" },
-            { id: "p022", name: "Theo Hernandez", rating: 84, position: "LB", rarity: "super_rare" },
-            { id: "p023", name: "Mike Maignan", rating: 85, position: "GK", rarity: "super_rare" },
-            { id: "p024", name: "Nicolo Zaniolo", rating: 84, position: "CAM", rarity: "super_rare" },
-            
-            // EPIC (фиолетовые)
-            { id: "p025", name: "Victor Osimhen", rating: 88, position: "ST", rarity: "epic" },
-            { id: "p026", name: "Khvicha Kvaratskhelia", rating: 87, position: "LW", rarity: "epic" },
-            { id: "p027", name: "Kim Min-jae", rating: 86, position: "CB", rarity: "epic" },
-            { id: "p028", name: "Andre Onana", rating: 87, position: "GK", rarity: "epic" },
-            { id: "p029", name: "Sergej Milinkovic-Savic", rating: 88, position: "CM", rarity: "epic" },
-            
-            // LEGENDARY (бело-золотые)
-            { id: "p030", name: "Leonardo Bonucci", rating: 91, position: "CB", rarity: "legendary" },
-            { id: "p031", name: "Marco Verratti", rating: 90, position: "CM", rarity: "legendary" },
-            { id: "p032", name: "Lorenzo Insigne", rating: 89, position: "LW", rarity: "legendary" },
-            { id: "p033", name: "Giorgio Chiellini", rating: 90, position: "CB", rarity: "legendary" },
-            
-            // SPECIAL (уникальные)
-            { id: "p034", name: "Francesco Totti", rating: 95, position: "CAM", rarity: "special" },
-            { id: "p035", name: "Paolo Maldini", rating: 94, position: "CB", rarity: "special" },
-            { id: "p036", name: "Alessandro Del Piero", rating: 93, position: "ST", rarity: "special" },
-            { id: "p037", name: "Roberto Baggio", rating: 94, position: "CAM", rarity: "special" }
+        // ================= IMAGE LIST =================
+        // Просто список всех PNG в папке images
+        // Чтобы добавить новую картинку - просто добавь сюда имя файла
+        const images = [
+            "1.png",
+            "2.png",
+            "3.png",
+            "4.png",
+            "5.png",
+            "6.png",
+            "7.png",
+            "8.png",
+            "9.png",
+            "10.png",
+            "11.png",
+            "12.png",
+            "13.png",
+            "14.png",
+            "15.png",
+            "16.png",
+            "17.png",
+            "18.png",
+            "19.png",
+            "20.png"
         ];
 
         // ================= STATE =================
         let isOpening = false;
-        let currentCard = null;
+        let currentImage = null;
         let currentLang = 'ru';
         let fireworkParticles = [];
         let animationFrame = null;
 
         // ================= DOM REFS =================
         const packView = document.getElementById('packView');
-        const cardView = document.getElementById('cardView');
+        const imageView = document.getElementById('imageView');
         const packElement = document.getElementById('packElement');
         const packLabel = document.getElementById('packLabel');
         const packSub = document.getElementById('packSub');
         const openPackBtn = document.getElementById('openPackBtn');
-        const cardContainer = document.getElementById('cardContainer');
+        const imageContainer = document.getElementById('imageContainer');
         const screenshotHint = document.getElementById('screenshotHint');
         const openAgainBtn = document.getElementById('openAgainBtn');
         const langBtns = document.querySelectorAll('.lang-btn');
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
 
-        // ================= RNG =================
-        function weightedRandom(weights) {
-            const total = Object.values(weights).reduce((a,b) => a + b, 0);
-            let rand = Math.random() * total;
-            for (const [key, weight] of Object.entries(weights)) {
-                rand -= weight;
-                if (rand <= 0) return key;
-            }
-            return Object.keys(weights)[0];
+        // ================= FUNCTIONS =================
+        function getRandomImage() {
+            const randomIndex = Math.floor(Math.random() * images.length);
+            return images[randomIndex];
         }
 
-        function rollRarity() {
-            return weightedRandom(RARITY_WEIGHTS);
-        }
-
-        function rollPlayer(rarity) {
-            const pool = cards.filter(c => c.rarity === rarity);
-            if (pool.length === 0) {
-                console.warn('No cards for rarity', rarity);
-                return cards[Math.floor(Math.random() * cards.length)];
-            }
-            return pool[Math.floor(Math.random() * pool.length)];
-        }
-
-        function isDramaticCard(card) {
-            return card.rarity === 'legendary' || card.rarity === 'special';
+        function getImagePath(filename) {
+            return `images/${filename}`;
         }
 
         // ================= PACK OPENING =================
         function openPack() {
             if (isOpening) return;
-            if (cards.length === 0) {
-                alert('No cards available!');
+            if (images.length === 0) {
+                alert('No images in the folder!');
                 return;
             }
             
             isOpening = true;
-            currentCard = null;
+            currentImage = null;
             packElement.classList.add('opening');
             openPackBtn.style.pointerEvents = 'none';
             
-            cardView.style.display = 'none';
+            imageView.style.display = 'none';
             packView.style.display = 'flex';
 
             packLabel.innerHTML = `<div class="pack-loading-text"><span class="loading-spinner"></span> ${translations[currentLang].loading}</div>`;
             packSub.textContent = '';
 
-            packElement.classList.remove('shake', 'flash', 'dramatic-loading');
+            packElement.classList.remove('shake', 'flash');
             void packElement.offsetWidth;
             packElement.classList.add('shake');
             
-            const rarity = rollRarity();
-            const card = rollPlayer(rarity);
-            currentCard = card;
-            
-            const isDramatic = isDramaticCard(card);
-            let revealDelay = 1000;
-            
-            if (isDramatic) {
-                packElement.classList.add('dramatic-loading');
-                packLabel.innerHTML = `<div class="pack-loading-text"><span class="loading-spinner"></span> ${translations[currentLang].dramaticLoading}</div>`;
-                revealDelay = 2500;
-                
-                setTimeout(() => {
-                    packElement.classList.add('flash');
-                }, 1000);
-                setTimeout(() => {
-                    packElement.classList.remove('flash');
-                }, 1500);
-                setTimeout(() => {
-                    packElement.classList.add('flash');
-                }, 1800);
-                setTimeout(() => {
-                    packElement.classList.remove('flash');
-                }, 2300);
-            }
+            const imageName = getRandomImage();
+            currentImage = imageName;
             
             setTimeout(() => {
                 packElement.classList.remove('shake');
-                if (!isDramatic) {
-                    packElement.classList.add('flash');
-                }
+                packElement.classList.add('flash');
             }, 500);
             
             setTimeout(() => {
-                packElement.classList.remove('flash', 'dramatic-loading');
-                renderCard(card);
-                launchFireworks(card.rarity, isDramatic);
+                packElement.classList.remove('flash');
+                showImage(imageName);
                 
                 packLabel.textContent = translations[currentLang].packLabel || 'PACK';
                 packSub.textContent = '';
                 packElement.classList.remove('opening');
                 openPackBtn.style.pointerEvents = 'auto';
                 isOpening = false;
-            }, revealDelay);
+            }, 1000);
         }
 
-        // ================= RENDER CARD =================
-        function renderCard(card) {
-            const rarityLabel = card.rarity.replace('_', ' ').toUpperCase();
-            const isDramatic = isDramaticCard(card);
+        // ================= SHOW IMAGE =================
+        function showImage(filename) {
+            const imagePath = getImagePath(filename);
             
-            // Decorative elements based on rarity
-            const decorMap = {
-                common: '⚽',
-                rare: '✦',
-                super_rare: '◆',
-                epic: '✦',
-                legendary: '⭐',
-                special: '🌙'
-            };
-            const decor = decorMap[card.rarity] || '⚽';
-            
-            const dramaticClass = isDramatic ? 'card-dramatic' : '';
-            
-            cardContainer.innerHTML = `
-                <div class="player-card ${card.rarity} ${dramaticClass}">
-                    <div class="card-top">
-                        <div class="card-rating">${card.rating}</div>
-                        <div class="card-position">${card.position}</div>
-                    </div>
-                    <div class="card-center">
-                        <div class="decor">${decor}</div>
-                        <div class="decor-text">${card.position}</div>
-                    </div>
-                    <div class="card-bottom">
-                        <div class="card-name">${card.name}</div>
-                        <div class="card-rarity-label">${rarityLabel}</div>
-                    </div>
+            imageContainer.innerHTML = `
+                <img src="${imagePath}" 
+                     alt="Card ${filename}" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="error-placeholder" style="display:none;">
+                    ⚠️ Image not found
                 </div>
             `;
 
+            // Проверяем, загрузилась ли картинка
+            const img = imageContainer.querySelector('img');
+            if (img) {
+                img.onload = function() {
+                    // Картинка загрузилась - запускаем фейерверки
+                    launchFireworks();
+                };
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    const placeholder = this.nextElementSibling;
+                    if (placeholder) placeholder.style.display = 'flex';
+                };
+            }
+
             screenshotHint.textContent = '📸 ' + translations[currentLang].screenshot;
             packView.style.display = 'none';
-            cardView.style.display = 'flex';
+            imageView.style.display = 'flex';
             openAgainBtn.textContent = translations[currentLang].openAgain;
         }
 
         // ================= FIREWORKS =================
-        function launchFireworks(rarity, isDramatic = false) {
-            const intensity = { common: 1, rare: 1.5, super_rare: 2, epic: 3, legendary: 4, special: 5 };
-            const multiplier = isDramatic ? 2 : 1;
-            const count = Math.min(80, Math.floor(15 + (intensity[rarity] || 1) * 10 * multiplier));
+        function launchFireworks() {
+            const count = 40;
             const particles = [];
             const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a29bfe', '#fd79a8', '#fdcb6e', '#ff9ff3', '#48dbfb'];
             const cx = window.innerWidth / 2;
             const cy = window.innerHeight / 2;
-            const spread = isDramatic ? 120 : 60;
 
             for (let i = 0; i < count; i++) {
                 const angle = Math.random() * 2 * Math.PI;
-                const speed = 1.5 + Math.random() * 5 * (isDramatic ? 1.3 : 1);
-                const size = 2 + Math.random() * 7 * (isDramatic ? 1.4 : 1);
+                const speed = 1.5 + Math.random() * 5;
+                const size = 2 + Math.random() * 7;
                 particles.push({
-                    x: cx + (Math.random() - 0.5) * spread,
-                    y: cy + (Math.random() - 0.5) * spread * 0.7,
+                    x: cx + (Math.random() - 0.5) * 60,
+                    y: cy + (Math.random() - 0.5) * 40,
                     vx: Math.cos(angle) * speed * (0.6 + Math.random() * 0.8),
                     vy: Math.sin(angle) * speed * (0.6 + Math.random() * 0.8) - 1.5,
                     life: 1,
@@ -878,25 +456,6 @@
                     color: colors[Math.floor(Math.random() * colors.length)],
                     gravity: 0.03 + Math.random() * 0.05,
                 });
-            }
-            
-            if (isDramatic) {
-                for (let i = 0; i < 25; i++) {
-                    const angle = Math.random() * 2 * Math.PI;
-                    const speed = 0.5 + Math.random() * 2;
-                    particles.push({
-                        x: cx + (Math.random() - 0.5) * 40,
-                        y: cy + (Math.random() - 0.5) * 30,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed - 0.5,
-                        life: 1,
-                        decay: 0.02 + Math.random() * 0.03,
-                        size: 1 + Math.random() * 3,
-                        color: '#ffffff',
-                        gravity: 0.01,
-                        sparkle: true,
-                    });
-                }
             }
             
             fireworkParticles = particles;
@@ -919,22 +478,12 @@
                 if (p.life <= 0) continue;
                 alive = true;
                 ctx.globalAlpha = p.life * 0.9;
-                
-                if (p.sparkle) {
-                    ctx.fillStyle = '#ffffff';
-                    ctx.shadowColor = '#ffffff';
-                    ctx.shadowBlur = 20;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, Math.max(0.5, p.size * p.life * 1.5), 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    ctx.fillStyle = p.color;
-                    ctx.shadowColor = p.color;
-                    ctx.shadowBlur = 15;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, Math.max(0.5, p.size * p.life * 0.8), 0, Math.PI * 2);
-                    ctx.fill();
-                }
+                ctx.fillStyle = p.color;
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, Math.max(0.5, p.size * p.life * 0.8), 0, Math.PI * 2);
+                ctx.fill();
             }
             ctx.shadowBlur = 0;
             ctx.globalAlpha = 1;
@@ -964,7 +513,7 @@
             openAgainBtn.textContent = translations[lang].openAgain;
             screenshotHint.textContent = '📸 ' + translations[lang].screenshot;
             packLabel.textContent = translations[lang].packLabel || 'PACK';
-            if (!cardView.style.display || cardView.style.display === 'none') {
+            if (!imageView.style.display || imageView.style.display === 'none') {
                 packSub.textContent = '';
             }
             try { localStorage.setItem('pack_lang', lang); } catch(e){}
@@ -974,11 +523,11 @@
         openPackBtn.addEventListener('click', openPack);
         packElement.addEventListener('click', openPack);
         openAgainBtn.addEventListener('click', () => {
-            cardView.style.display = 'none';
+            imageView.style.display = 'none';
             packView.style.display = 'flex';
-            packElement.classList.remove('opening', 'dramatic-loading');
+            packElement.classList.remove('opening');
             openPackBtn.style.pointerEvents = 'auto';
-            currentCard = null;
+            currentImage = null;
             packLabel.textContent = translations[currentLang].packLabel || 'PACK';
             packSub.textContent = '';
             
@@ -1011,14 +560,8 @@
             
             isOpening = false;
             packElement.classList.remove('opening');
-            console.log('⚽ PACK game ready!');
-            console.log('📊 Total cards:', cards.length);
-            console.log('📊 Common:', cards.filter(c => c.rarity === 'common').length);
-            console.log('📊 Rare:', cards.filter(c => c.rarity === 'rare').length);
-            console.log('📊 Super Rare:', cards.filter(c => c.rarity === 'super_rare').length);
-            console.log('📊 Epic:', cards.filter(c => c.rarity === 'epic').length);
-            console.log('📊 Legendary:', cards.filter(c => c.rarity === 'legendary').length);
-            console.log('📊 Special:', cards.filter(c => c.rarity === 'special').length);
+            console.log('⚽ PACK ready!');
+            console.log('📁 Images found:', images.length);
         }
 
         init();
