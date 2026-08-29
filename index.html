@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071321">
-  <title>FIFA 62</title>
+  <title>FIFA 62 — Pack Opening</title>
   <style>
     :root {
       --ink: #eaf6ff;
@@ -58,6 +58,8 @@
 
     button { font: inherit; }
     .app {
+      position: relative;
+      z-index: 1;
       width: min(100%, 620px);
       min-height: 100vh;
       margin: 0 auto;
@@ -166,6 +168,11 @@
     .pack-foot { position: absolute; bottom: 15px; color: rgba(214, 246, 255, .5); font-size: .48rem; font-weight: 800; letter-spacing: .24em; }
     .pack.opening { animation: packOpen .98s ease-in-out forwards; }
     .pack.opening::after { animation: sheen .75s ease-in .12s forwards; }
+    .pack.rare-opening {
+      animation: rarePackCharge 1.18s cubic-bezier(.16,.75,.2,1) forwards;
+      box-shadow: 15px 25px 38px rgba(0, 0, 0, .55), inset 0 0 0 2px rgba(255, 236, 159, .82), inset 0 0 54px rgba(255, 186, 42, .72), 0 0 72px rgba(255, 195, 58, .84);
+    }
+    .pack.rare-opening::after { animation: rarePackBeam 1.18s ease-out forwards; }
 
     .primary {
       min-width: 225px;
@@ -189,6 +196,54 @@
     .tip kbd { padding: 2px 5px; border: 1px solid rgba(134,203,234,.25); border-radius: 4px; color: #a7c5d5; font-family: inherit; }
 
     .card-screen { text-align: center; }
+    .rare-atmosphere {
+      position: fixed;
+      z-index: 0;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .55s ease;
+    }
+    body.rare-opening .rare-atmosphere, body.rare-reveal .rare-atmosphere { opacity: 1; }
+    .rare-vignette { position: absolute; inset: 0; background: rgba(0, 4, 10, .52); }
+    .rare-spotlight {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      width: min(100vmax, 920px);
+      height: min(105vmax, 920px);
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background:
+        conic-gradient(from 218deg at 50% 4%, transparent 0 17%, rgba(255, 193, 55, .16) 21%, transparent 28% 44%, rgba(112, 235, 255, .13) 48%, transparent 55% 100%),
+        radial-gradient(ellipse at 50% 27%, rgba(255, 232, 166, .42), rgba(255, 177, 37, .17) 21%, transparent 57%);
+      filter: blur(7px);
+      animation: none;
+    }
+    .rare-orbit { position: absolute; top: 52%; left: 50%; width: min(90vw, 520px); aspect-ratio: 1; border: 1px solid rgba(255, 216, 112, .2); border-radius: 50%; transform: translate(-50%, -50%) scale(.76); box-shadow: 0 0 0 46px rgba(255, 203, 73, .035), 0 0 60px rgba(255, 185, 40, .28); animation: rareOrbit 3.8s ease-in-out infinite; }
+    body.rare-opening .rare-vignette { animation: rareDarken .9s ease forwards; }
+    body.rare-opening .rare-spotlight { animation: rareSpotlightStart 1.18s cubic-bezier(.14,.8,.24,1) forwards; }
+    body.rare-reveal .rare-spotlight { animation: rareLight 4.2s ease-in-out infinite alternate; }
+    body.rare-opening .topbar, body.rare-opening .footer, body.rare-reveal .topbar, body.rare-reveal .footer { opacity: .45; transition: opacity .35s ease; }
+    .rare-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      border: 1px solid rgba(255, 228, 144, .62);
+      border-radius: 99px;
+      color: #fff0b8;
+      background: linear-gradient(100deg, rgba(151, 89, 6, .7), rgba(255, 190, 50, .35), rgba(102, 58, 3, .72));
+      box-shadow: 0 0 22px rgba(255, 193, 57, .28), inset 0 1px rgba(255,255,255,.36);
+      font-size: .58rem;
+      font-weight: 950;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+      animation: rareBadge .9s .22s both;
+    }
+    .rare-badge::before { content: "✦"; color: #fff8db; font-size: .85rem; }
     .result-header { margin-bottom: 16px; }
     .result-header .eyebrow { margin-bottom: 6px; }
     .result-title { margin: 0; font-size: 1.55rem; font-weight: 900; letter-spacing: -.045em; }
@@ -202,9 +257,19 @@
       border-radius: 17px 4px 17px 4px;
       background: linear-gradient(140deg, rgba(133, 241, 255, .7), rgba(20, 145, 242, .28) 38%, rgba(255, 199, 82, .58) 100%);
       box-shadow: 0 20px 46px rgba(0, 0, 0, .5), 0 0 46px rgba(28, 176, 255, .2);
-      animation: reveal .55s cubic-bezier(.14,.9,.24,1.2) both;
     }
+    .card-frame.revealing { animation: reveal .55s cubic-bezier(.14,.9,.24,1.2) both; }
     .card-frame::before { position: absolute; inset: -2px; z-index: -1; border-radius: inherit; content: ""; background: linear-gradient(110deg, transparent 20%, rgba(218,252,255,.72), transparent 49%); filter: blur(10px); }
+    .card-screen.is-rare .card-frame {
+      isolation: isolate;
+      border-color: rgba(255, 226, 141, .88);
+      background: linear-gradient(140deg, #fff3bd, #f7b82f 28%, #735000 62%, #ffdb65);
+      box-shadow: 0 26px 60px rgba(0, 0, 0, .65), 0 0 38px rgba(255, 193, 55, .65), 0 0 100px rgba(35, 181, 255, .24);
+    }
+    .card-screen.is-rare .card-frame::before { background: linear-gradient(112deg, transparent 15%, rgba(255,255,255,.94), rgba(255,213,94,.8) 48%, transparent 66%); filter: blur(13px); }
+    .card-screen.is-rare .card-frame::after { position: absolute; z-index: -2; inset: -90px -130px; content: ""; background: radial-gradient(ellipse, rgba(255, 225, 127, .58), rgba(255, 180, 27, .24) 35%, transparent 69%); filter: blur(10px); animation: rareCardGlow 1.7s ease-in-out infinite alternate; }
+    .card-screen.is-rare .result-title { color: #fff2bf; text-shadow: 0 0 20px rgba(255, 193, 55, .38); }
+    .card-screen.is-rare .result-title strong { color: #fff; text-shadow: 0 0 18px rgba(255, 198, 64, .9); }
     .card-image {
       display: block;
       width: 100%;
@@ -244,6 +309,14 @@
     }
     @keyframes sheen { to { transform: translate(80%, -100%) rotate(-34deg); opacity: .9; } }
     @keyframes reveal { from { opacity: 0; transform: translateY(28px) scale(.82); filter: brightness(2.3); } to { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); } }
+    @keyframes rareLight { from { transform: translateX(-50%) rotate(-4deg) scale(.95); opacity: .72; } to { transform: translateX(-50%) rotate(5deg) scale(1.09); opacity: 1; } }
+    @keyframes rareDarken { from { background: rgba(0, 4, 10, 0); } to { background: rgba(0, 4, 10, .7); } }
+    @keyframes rareSpotlightStart { 0% { opacity: 0; transform: translateX(-50%) scale(.58); filter: blur(21px); } 56% { opacity: .42; transform: translateX(-50%) scale(.83); filter: blur(13px); } 100% { opacity: 1; transform: translateX(-50%) scale(1); filter: blur(7px); } }
+    @keyframes rarePackCharge { 0% { filter: brightness(1); transform: perspective(900px) rotateY(-7deg) rotateZ(2deg) scale(1); } 52% { filter: brightness(1.28); transform: perspective(900px) rotateY(-4deg) rotateZ(1deg) scale(1.035); } 83% { filter: brightness(1.86); transform: perspective(900px) rotateY(2deg) rotateZ(-1deg) scale(1.055); } 100% { filter: brightness(2.35); transform: perspective(900px) rotateY(0) rotateZ(0) scale(1.08); } }
+    @keyframes rarePackBeam { 0% { opacity: 0; transform: translate(-15%, 30%) rotate(-34deg); } 62% { opacity: .56; } 100% { opacity: 1; transform: translate(84%, -105%) rotate(-34deg); } }
+    @keyframes rareOrbit { 50% { transform: translate(-50%, -50%) scale(1.04); opacity: .88; } }
+    @keyframes rareBadge { from { opacity: 0; transform: translateY(-10px) scale(.75); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes rareCardGlow { from { opacity: .48; transform: scale(.9); } to { opacity: 1; transform: scale(1.08); } }
     @media (max-height: 720px) { .opening-stage { padding-top: 15px; } .pack-area { width: min(63vw, 235px); margin: 18px auto; } .subtitle { margin-top: 9px; } }
     @media (max-width: 380px) { .app { padding-inline: 13px; } .pack-area { width: min(78vw, 270px); } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
@@ -290,6 +363,7 @@
 
       <div id="cardScreen" class="card-screen" hidden>
         <div class="result-header">
+          <div id="rareBadge" class="rare-badge" hidden>RARE PULL</div>
           <p class="eyebrow" id="resultEyebrow">ТВОЙ НОВЫЙ ИГРОК</p>
           <p class="result-title" id="resultTitle">КАРТА <strong>ВЫПАЛА!</strong></p>
         </div>
@@ -303,15 +377,19 @@
 
     <footer class="footer" id="footer">FIFA 62 · Pack opening experience</footer>
   </main>
+  <div class="rare-atmosphere" aria-hidden="true">
+    <div class="rare-vignette"></div>
+    <div class="rare-spotlight"></div>
+    <div class="rare-orbit"></div>
+  </div>
   <canvas id="fx" aria-hidden="true"></canvas>
 
   <script>
     // Добавляй сюда точные имена файлов из папки images.
     // Структура: index.html и папка images должны находиться рядом.
-    const cards = [
-  "1.jpeg", "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg", "6.jpg",
-  "7.jpeg", "8.jpeg", "9.jpeg", "10.jpeg", "11.jpeg", "12.jpeg"
-];
+    const cards = ["01.jpeg", "02.jpeg", "03.jpeg", "04.jpeg", "05.jpeg"];
+    // Переноси сюда названия карт, для которых нужен праздничный редкий эффект.
+    const rareCards = new Set(["04.jpeg", "05.jpeg"]);
     const cardDirectory = "images";
 
     const text = {
@@ -319,19 +397,19 @@
         eyebrow: "ЛЕГЕНДАРНЫЙ НАБОР", heading: "ОТКРОЙ <span>ПАК</span>", subtitle: "Каждое открытие — новая футбольная карта.",
         open: "ОТКРЫТЬ ПАК", opening: "ОТКРЫВАЕМ…", tip: "Нажми на пак или кнопку", resultEyebrow: "ТВОЙ НОВЫЙ ИГРОК",
         result: "КАРТА <strong>ВЫПАЛА!</strong>", again: "ОТКРЫТЬ ЕЩЁ", back: "Вернуться к набору", footer: "FIFA 62 · Открытие наборов",
-        missing: "Карта не найдена", check: "Проверь путь:"
+        missing: "Карта не найдена", check: "Проверь путь:", rareBadge: "РЕДКАЯ КАРТА", rareEyebrow: "НЕВЕРОЯТНЫЙ ВЫПАД", rareResult: "ЭТО <strong>ЛЕГЕНДА!</strong>", rareOpening: "ЗАРЯЖАЕМ РЕДКИЙ ПАК…"
       },
       en: {
         eyebrow: "LEGENDARY PACK", heading: "OPEN THE <span>PACK</span>", subtitle: "Every opening reveals a new football card.",
         open: "OPEN PACK", opening: "OPENING…", tip: "Tap the pack or the button", resultEyebrow: "YOUR NEW PLAYER",
         result: "CARD <strong>REVEALED!</strong>", again: "OPEN ANOTHER", back: "Back to the pack", footer: "FIFA 62 · Pack opening experience",
-        missing: "Card not found", check: "Check the path:"
+        missing: "Card not found", check: "Check the path:", rareBadge: "RARE PULL", rareEyebrow: "INCREDIBLE PULL", rareResult: "IT'S A <strong>LEGEND!</strong>", rareOpening: "CHARGING RARE PACK…"
       },
       kz: {
         eyebrow: "АҢЫЗДЫҚ ЖИНАҚ", heading: "ПАКЕТТІ <span>АШ</span>", subtitle: "Әр ашылым — жаңа футбол картасы.",
         open: "ПАКЕТТІ АШУ", opening: "АШЫЛУДА…", tip: "Пакетке не батырмаға бас", resultEyebrow: "СЕНІҢ ЖАҢА ОЙЫНШЫҢ",
         result: "КАРТА <strong>ТҮСТІ!</strong>", again: "ҚАЙТА АШУ", back: "Пакетке оралу", footer: "FIFA 62 · Пакеттерді ашу",
-        missing: "Карта табылмады", check: "Жолды тексер:"
+        missing: "Карта табылмады", check: "Жолды тексер:", rareBadge: "СИРЕК КАРТА", rareEyebrow: "КЕРЕМЕТ ТҮСІМ", rareResult: "БҰЛ <strong>АҢЫЗ!</strong>", rareOpening: "СИРЕК ПАКЕТ ДАЙЫН…"
       }
     };
 
@@ -342,6 +420,7 @@
     const againButton = document.getElementById("againButton");
     const backButton = document.getElementById("backButton");
     const cardFrame = document.getElementById("cardFrame");
+    const rareBadge = document.getElementById("rareBadge");
     const fx = document.getElementById("fx");
     const context = fx.getContext("2d");
     let language = "ru";
@@ -349,9 +428,16 @@
     let lastCard = null;
     let particles = [];
     let animationId = 0;
+    let currentIsRare = false;
 
     function currentText() { return text[language]; }
     function cardPath(fileName) { return `${cardDirectory}/${encodeURIComponent(fileName)}`; }
+    function updateResultCopy() {
+      const copy = currentText();
+      document.getElementById("resultEyebrow").textContent = currentIsRare ? copy.rareEyebrow : copy.resultEyebrow;
+      document.getElementById("resultTitle").innerHTML = currentIsRare ? copy.rareResult : copy.result;
+      rareBadge.textContent = copy.rareBadge;
+    }
     function pickCard() {
       if (!cards.length) return null;
       if (cards.length === 1) return cards[0];
@@ -367,8 +453,7 @@
       document.getElementById("heading").innerHTML = copy.heading;
       document.getElementById("subtitle").textContent = copy.subtitle;
       document.getElementById("tip").textContent = copy.tip;
-      document.getElementById("resultEyebrow").textContent = copy.resultEyebrow;
-      document.getElementById("resultTitle").innerHTML = copy.result;
+      updateResultCopy();
       document.getElementById("againButton").textContent = copy.again;
       document.getElementById("backButton").textContent = copy.back;
       document.getElementById("footer").textContent = copy.footer;
@@ -385,14 +470,15 @@
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     }
 
-    function launchParticles() {
-      const colors = ["#78efff", "#ffffff", "#ffc85a", "#2c9dff", "#a8f4ff"];
+    function launchParticles(isRare = false) {
+      const colors = isRare ? ["#fff5c5", "#ffc541", "#ffffff", "#ff9d28", "#67ecff"] : ["#78efff", "#ffffff", "#ffc85a", "#2c9dff", "#a8f4ff"];
+      const count = isRare ? 144 : 72;
       const centerX = window.innerWidth / 2;
       const centerY = Math.min(window.innerHeight * .47, 370);
-      particles = Array.from({ length: 72 }, () => {
+      particles = Array.from({ length: count }, () => {
         const angle = Math.random() * Math.PI * 2;
         const speed = 2 + Math.random() * 6;
-        return { x: centerX, y: centerY, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 2, life: 1, decay: .012 + Math.random() * .017, size: 1 + Math.random() * 3.5, color: colors[Math.floor(Math.random() * colors.length)] };
+        return { x: centerX, y: centerY, vx: Math.cos(angle) * speed * (isRare ? 1.23 : 1), vy: Math.sin(angle) * speed - 2, life: 1, decay: .012 + Math.random() * .017, size: 1 + Math.random() * (isRare ? 5 : 3.5), square: isRare && Math.random() > .48, color: colors[Math.floor(Math.random() * colors.length)] };
       });
       cancelAnimationFrame(animationId);
       drawParticles();
@@ -413,9 +499,18 @@
         context.fillStyle = particle.color;
         context.shadowColor = particle.color;
         context.shadowBlur = 12;
-        context.beginPath();
-        context.arc(particle.x, particle.y, particle.size * particle.life, 0, Math.PI * 2);
-        context.fill();
+        if (particle.square) {
+          context.save();
+          context.translate(particle.x, particle.y);
+          context.rotate(particle.life * Math.PI * 2);
+          const size = particle.size * particle.life;
+          context.fillRect(-size / 2, -size / 2, size, size);
+          context.restore();
+        } else {
+          context.beginPath();
+          context.arc(particle.x, particle.y, particle.size * particle.life, 0, Math.PI * 2);
+          context.fill();
+        }
       }
       context.globalAlpha = 1;
       context.shadowBlur = 0;
@@ -425,18 +520,26 @@
 
     function showCard(fileName) {
       const copy = currentText();
+      currentIsRare = rareCards.has(fileName);
       packScreen.hidden = true;
       cardScreen.hidden = false;
+      cardScreen.classList.toggle("is-rare", currentIsRare);
+      document.body.classList.toggle("rare-reveal", currentIsRare);
+      rareBadge.hidden = !currentIsRare;
+      updateResultCopy();
       cardFrame.innerHTML = "";
+      cardFrame.classList.remove("revealing");
+      void cardFrame.offsetWidth;
+      cardFrame.classList.add("revealing");
       const image = new Image();
       image.className = "card-image";
       image.alt = "FIFA 62 card";
-      image.src = cardPath(fileName);
-      image.addEventListener("load", launchParticles, { once: true });
+      image.addEventListener("load", () => launchParticles(currentIsRare), { once: true });
       image.addEventListener("error", () => {
         cardFrame.innerHTML = `<div class="card-error"><div>${copy.missing}<br><span>${copy.check} ${cardPath(fileName)}</span></div></div>`;
-        launchParticles();
+        launchParticles(currentIsRare);
       }, { once: true });
+      image.src = cardPath(fileName);
       cardFrame.append(image);
       lastCard = fileName;
     }
@@ -445,26 +548,51 @@
       if (opening) return;
       const selectedCard = pickCard();
       if (!selectedCard) return;
+      const isRare = rareCards.has(selectedCard);
       opening = true;
+      currentIsRare = isRare;
       pack.disabled = true;
       openButton.disabled = true;
-      openButton.textContent = currentText().opening;
-      pack.classList.remove("opening");
-      void pack.offsetWidth;
-      pack.classList.add("opening");
-      window.setTimeout(() => {
+      openButton.textContent = isRare ? currentText().rareOpening : currentText().opening;
+
+      const revealCard = () => {
         pack.classList.remove("opening");
         pack.disabled = false;
         openButton.disabled = false;
         opening = false;
         openButton.textContent = currentText().open;
         showCard(selectedCard);
-      }, 980);
+      };
+
+      if (isRare) {
+        document.body.classList.add("rare-opening");
+        pack.classList.remove("opening", "rare-opening");
+        void pack.offsetWidth;
+        pack.classList.add("rare-opening");
+        window.setTimeout(() => {
+          pack.classList.remove("rare-opening");
+          pack.classList.add("opening");
+        }, 1180);
+        window.setTimeout(() => {
+          document.body.classList.remove("rare-opening");
+          revealCard();
+        }, 2160);
+      } else {
+        pack.classList.remove("opening", "rare-opening");
+        void pack.offsetWidth;
+        pack.classList.add("opening");
+        window.setTimeout(revealCard, 980);
+      }
     }
 
     function returnToPack() {
       cardScreen.hidden = true;
       packScreen.hidden = false;
+      cardScreen.classList.remove("is-rare");
+      document.body.classList.remove("rare-reveal");
+      document.body.classList.remove("rare-opening");
+      rareBadge.hidden = true;
+      currentIsRare = false;
       particles = [];
       cancelAnimationFrame(animationId);
       context.clearRect(0, 0, window.innerWidth, window.innerHeight);
